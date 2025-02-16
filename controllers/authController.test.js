@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import {
     registerController, loginController, forgotPasswordController, testController,
-    updateProfileController, getOrdersController, getAllOrdersController
+    updateProfileController, getOrdersController, getAllOrdersController, orderStatusController
 } from "./authController.js";
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
@@ -486,6 +486,101 @@ describe("Update Profile Controller", () => {
         });
     });
 
+    it("should update profile keeping existing name when not provided", async () => {
+        userModel.findById.mockResolvedValue({
+            _id: "user123",
+            name: "Old Name",
+            phone: "1111111111",
+            address: "Old Address",
+        });
+
+        userModel.findByIdAndUpdate.mockResolvedValue({
+            _id: "user123",
+            name: "Old Name",
+            phone: "1234567890",
+            address: "123 Street",
+        });
+
+        req.body = {
+            name: undefined,
+            phone: "1234567890",
+            address: "123 Street",
+        };
+
+        await updateProfileController(req, res);
+
+        expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            "user123",
+            {
+                name: "Old Name",
+                password: undefined,
+                phone: "1234567890",
+                address: "123 Street",
+            },
+            { new: true }
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: true,
+            message: "Profile Updated SUccessfully",
+            updatedUser: expect.objectContaining({
+                _id: "user123",
+                name: "Old Name",
+                phone: "1234567890",
+                address: "123 Street",
+            }),
+        });
+    });
+
+    it("should update profile keeping existing phone and address when not provided", async () => {
+        userModel.findById.mockResolvedValue({
+            _id: "user123",
+            name: "Old Name",
+            phone: "1111111111",
+            address: "Old Address",
+        });
+
+        userModel.findByIdAndUpdate.mockResolvedValue({
+            _id: "user123",
+            name: "John Doe",
+            phone: "1111111111",
+            address: "Old Address",
+        });
+
+        req.body = {
+            name: "John Doe",
+            password: undefined,
+            phone: undefined,
+            address: undefined,
+        };
+
+        await updateProfileController(req, res);
+
+        expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            "user123",
+            {
+                name: "John Doe",
+                password: undefined,
+                phone: "1111111111",
+                address: "Old Address",
+            },
+            { new: true }
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: true,
+            message: "Profile Updated SUccessfully",
+            updatedUser: expect.objectContaining({
+                _id: "user123",
+                name: "John Doe",
+                phone: "1111111111",
+                address: "Old Address",
+            }),
+        });
+    });
+
     it("should return a 400 error if an exception occurs", async () => {
         userModel.findById.mockRejectedValue(new Error("Database error"));
 
@@ -595,6 +690,7 @@ describe("Get All Orders Controller", () => {
         orderModel.find = jest.fn(() => ({ populate: populateMocks[0] }));
     });
 
+    // Need fix
     it("should return all orders successfully", async () => {
         await getAllOrdersController(req, res);
 
@@ -616,6 +712,57 @@ describe("Get All Orders Controller", () => {
         expect(res.send).toHaveBeenCalledWith({
             success: false,
             message: "Error WHile Geting Orders",
+            error: expect.any(Error),
+        });
+    });
+});
+
+describe("Order Status Controller", () => {
+    let req, res;
+
+    const mockUpdatedOrder = {
+        _id: "order1",
+        products: [{ _id: "product1", name: "Laptop" }],
+        buyer: { _id: "user123", name: "John Doe" },
+        status: "Shipped",
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {
+            params: { orderId: "order1" },
+            body: { status: "Shipped" },
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            json: jest.fn(),
+        };
+
+        orderModel.findByIdAndUpdate = jest.fn().mockResolvedValue(mockUpdatedOrder);
+    });
+
+    // Need fix
+    it("should update order status successfully", async () => {
+        await orderStatusController(req, res);
+
+        expect(orderModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            "order1",
+            { status: "Shipped" },
+            { new: true }
+        );
+        expect(res.json).toHaveBeenCalledWith(mockUpdatedOrder);
+    });
+
+    it("should return a 500 error if an exception occurs", async () => {
+        orderModel.findByIdAndUpdate.mockRejectedValue(new Error("Database error"));
+
+        await orderStatusController(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Error While Updateing Order",
             error: expect.any(Error),
         });
     });
