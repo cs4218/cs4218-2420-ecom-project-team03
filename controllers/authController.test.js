@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
-import { registerController, loginController, forgotPasswordController } from "./authController.js";
+import { registerController, loginController, forgotPasswordController, testController } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { jest } from "@jest/globals";
 
@@ -322,5 +322,36 @@ describe("Forgot Password Controller", () => {
             message: "Something went wrong",
             error: expect.any(Error),
         });
+    });
+});
+
+describe("Test Controller", () => {
+    let req, res;
+
+    beforeEach(() => {
+        req = {};
+        res = {
+            send: jest.fn(),
+        };
+    });
+
+    it("should return 'Protected Routes'", () => {
+        testController(req, res);
+
+        expect(res.send).toHaveBeenCalledWith("Protected Routes");
+    });
+
+    it("should handle unexpected errors", () => {
+        const errorMock = new Error("Unexpected error");
+        
+        const faultyTestController = () => {
+            throw errorMock;
+        };
+
+        try {
+            faultyTestController();
+        } catch (error) {
+            expect(error).toBe(errorMock);
+        }
     });
 });

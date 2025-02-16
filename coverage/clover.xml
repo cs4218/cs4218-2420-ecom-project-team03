@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1739715468113" clover="3.2.0">
-  <project timestamp="1739715468113" name="All files">
-    <metrics statements="260" coveredstatements="60" conditionals="80" coveredconditionals="30" methods="30" coveredmethods="3" elements="370" coveredelements="93" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
+<coverage generated="1739715619312" clover="3.2.0">
+  <project timestamp="1739715619312" name="All files">
+    <metrics statements="260" coveredstatements="62" conditionals="80" coveredconditionals="30" methods="30" coveredmethods="4" elements="370" coveredelements="96" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
     <file name="authController.js" path="C:\Users\Home\Downloads\cs4218-2420-ecom-project-team03\controllers\authController.js">
-      <metrics statements="91" coveredstatements="60" conditionals="44" coveredconditionals="30" methods="8" coveredmethods="3"/>
+      <metrics statements="91" coveredstatements="62" conditionals="44" coveredconditionals="30" methods="8" coveredmethods="4"/>
       <line num="7" count="1" type="stmt"/>
       <line num="8" count="9" type="stmt"/>
       <line num="9" count="9" type="stmt"/>
@@ -60,8 +60,8 @@
       <line num="148" count="4" type="stmt"/>
       <line num="149" count="4" type="stmt"/>
       <line num="158" count="1" type="stmt"/>
-      <line num="159" count="0" type="stmt"/>
-      <line num="160" count="0" type="stmt"/>
+      <line num="159" count="1" type="stmt"/>
+      <line num="160" count="1" type="stmt"/>
       <line num="162" count="0" type="stmt"/>
       <line num="163" count="0" type="stmt"/>
       <line num="168" count="1" type="stmt"/>
