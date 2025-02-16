@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import {
     registerController, loginController, forgotPasswordController, testController,
-    updateProfileController, getOrdersController
+    updateProfileController, getOrdersController, getAllOrdersController
 } from "./authController.js";
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
@@ -560,3 +560,63 @@ describe("Get Orders Controller", () => {
     });
 });
 
+describe("Get All Orders Controller", () => {
+    let req, res;
+
+    const mockOrders = [
+        {
+            _id: "order1",
+            products: [{ _id: "product1", name: "Laptop" }],
+            buyer: { _id: "user123", name: "John Doe" },
+            status: "Processing",
+        },
+        {
+            _id: "order2",
+            products: [{ _id: "product2", name: "Phone" }],
+            buyer: { _id: "user123", name: "John Doe" },
+            status: "Shipped",
+        },
+    ];
+
+    const populateMocks = [
+        jest.fn(() => ({ populate: populateMocks[1] })),
+        jest.fn(() => ({ sort: jest.fn(() => ({ exec: jest.fn().mockResolvedValue(mockOrders) })) })),
+    ];
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {};
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            json: jest.fn(),
+        };
+
+        orderModel.find = jest.fn(() => ({ populate: populateMocks[0] }));
+    });
+
+    it("should return all orders successfully", async () => {
+        await getAllOrdersController(req, res);
+
+        expect(orderModel.find).toHaveBeenCalledWith({});
+
+        expect(populateMocks[0]).toHaveBeenCalledWith("products", "-photo");
+        expect(populateMocks[1]).toHaveBeenCalledWith("buyer", "name");
+
+        expect(populateMocks[1]().sort).toHaveBeenCalledWith({ createdAt: "-1" });
+        expect(res.json).toHaveBeenCalledWith(mockOrders);
+    });
+
+    it("should return a 500 error if an exception occurs", async () => {
+        orderModel.find.mockReturnValue(new Error("Error find Database"))
+
+        await getAllOrdersController(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Error WHile Geting Orders",
+            error: expect.any(Error),
+        });
+    });
+});

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1739720754355" clover="3.2.0">
-  <project timestamp="1739720754355" name="All files">
-    <metrics statements="260" coveredstatements="79" conditionals="80" coveredconditionals="41" methods="30" coveredmethods="6" elements="370" coveredelements="126" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
+<coverage generated="1739721265377" clover="3.2.0">
+  <project timestamp="1739721265377" name="All files">
+    <metrics statements="260" coveredstatements="84" conditionals="80" coveredconditionals="41" methods="30" coveredmethods="7" elements="370" coveredelements="132" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
     <file name="authController.js" path="C:\Users\Home\Downloads\cs4218-2420-ecom-project-team03\controllers\authController.js">
-      <metrics statements="91" coveredstatements="79" conditionals="44" coveredconditionals="41" methods="8" coveredmethods="6"/>
+      <metrics statements="91" coveredstatements="84" conditionals="44" coveredconditionals="41" methods="8" coveredmethods="7"/>
       <line num="7" count="1" type="stmt"/>
       <line num="8" count="9" type="stmt"/>
       <line num="9" count="9" type="stmt"/>
@@ -82,11 +82,11 @@
       <line num="211" count="1" type="stmt"/>
       <line num="212" count="1" type="stmt"/>
       <line num="220" count="1" type="stmt"/>
-      <line num="221" count="0" type="stmt"/>
-      <line num="222" count="0" type="stmt"/>
-      <line num="227" count="0" type="stmt"/>
-      <line num="229" count="0" type="stmt"/>
-      <line num="230" count="0" type="stmt"/>
+      <line num="221" count="2" type="stmt"/>
+      <line num="222" count="2" type="stmt"/>
+      <line num="227" count="1" type="stmt"/>
+      <line num="229" count="1" type="stmt"/>
+      <line num="230" count="1" type="stmt"/>
       <line num="239" count="1" type="stmt"/>
       <line num="240" count="0" type="stmt"/>
       <line num="241" count="0" type="stmt"/>
