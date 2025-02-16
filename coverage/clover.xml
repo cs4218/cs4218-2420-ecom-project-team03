@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1739714629621" clover="3.2.0">
-  <project timestamp="1739714629622" name="All files">
-    <metrics statements="260" coveredstatements="30" conditionals="80" coveredconditionals="14" methods="30" coveredmethods="1" elements="370" coveredelements="45" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
+<coverage generated="1739715048650" clover="3.2.0">
+  <project timestamp="1739715048650" name="All files">
+    <metrics statements="260" coveredstatements="44" conditionals="80" coveredconditionals="22" methods="30" coveredmethods="2" elements="370" coveredelements="68" complexity="0" loc="260" ncloc="260" packages="1" files="3" classes="3"/>
     <file name="authController.js" path="C:\Users\Home\Downloads\cs4218-2420-ecom-project-team03\controllers\authController.js">
-      <metrics statements="91" coveredstatements="30" conditionals="44" coveredconditionals="14" methods="8" coveredmethods="1"/>
+      <metrics statements="91" coveredstatements="44" conditionals="44" coveredconditionals="22" methods="8" coveredmethods="2"/>
       <line num="7" count="1" type="stmt"/>
       <line num="8" count="9" type="stmt"/>
       <line num="9" count="9" type="stmt"/>
@@ -28,20 +28,20 @@
       <line num="56" count="1" type="stmt"/>
       <line num="57" count="1" type="stmt"/>
       <line num="66" count="1" type="stmt"/>
-      <line num="67" count="0" type="stmt"/>
-      <line num="68" count="0" type="stmt"/>
-      <line num="70" count="0" type="cond" truecount="0" falsecount="4"/>
-      <line num="71" count="0" type="stmt"/>
-      <line num="77" count="0" type="stmt"/>
-      <line num="78" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="79" count="0" type="stmt"/>
-      <line num="84" count="0" type="stmt"/>
-      <line num="85" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="86" count="0" type="stmt"/>
-      <line num="92" count="0" type="stmt"/>
-      <line num="95" count="0" type="stmt"/>
-      <line num="109" count="0" type="stmt"/>
-      <line num="110" count="0" type="stmt"/>
+      <line num="67" count="6" type="stmt"/>
+      <line num="68" count="6" type="stmt"/>
+      <line num="70" count="6" type="cond" truecount="4" falsecount="0"/>
+      <line num="71" count="2" type="stmt"/>
+      <line num="77" count="4" type="stmt"/>
+      <line num="78" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="79" count="1" type="stmt"/>
+      <line num="84" count="2" type="stmt"/>
+      <line num="85" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="86" count="1" type="stmt"/>
+      <line num="92" count="1" type="stmt"/>
+      <line num="95" count="1" type="stmt"/>
+      <line num="109" count="1" type="stmt"/>
+      <line num="110" count="1" type="stmt"/>
       <line num="120" count="1" type="stmt"/>
       <line num="121" count="0" type="stmt"/>
       <line num="122" count="0" type="stmt"/>

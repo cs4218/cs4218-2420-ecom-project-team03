@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt";
-import { registerController } from "./authController.js";
+import JWT from "jsonwebtoken";
+import { registerController, loginController } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { jest } from "@jest/globals";
 
 jest.spyOn(bcrypt, "hash");
+jest.spyOn(bcrypt, "compare")
+jest.spyOn(JWT, "sign");
 
 jest.spyOn(userModel, "findOne");
 jest.spyOn(userModel, "create");
@@ -114,6 +117,126 @@ describe("Register Controller", () => {
         expect(res.send).toHaveBeenCalledWith({
             success: false,
             message: "Errro in Registeration",
+            error: expect.any(Error),
+        });
+    });
+});
+
+describe("Login Controller", () => {
+    let req, res;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {
+            body: {
+                email: "test@example.com",
+                password: "password123",
+            },
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+        };
+    });
+
+    it("should return an error if email or password is missing", async () => {
+        req.body = { email: "", password: "password123" };
+        await loginController(req, res);
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Invalid email or password",
+        });
+
+        req.body = { email: "test@example.com", password: "" };
+        await loginController(req, res);
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Invalid email or password",
+        });
+    });
+
+    it("should return an error if user is not registered", async () => {
+        userModel.findOne.mockResolvedValue(null);
+
+        await loginController(req, res);
+
+        expect(userModel.findOne).toHaveBeenCalledWith({ email: "test@example.com" });
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Email is not registerd",
+        });
+    });
+
+    it("should return an error if password is incorrect", async () => {
+        userModel.findOne.mockResolvedValue({
+            _id: "user123",
+            email: "test@example.com",
+            password: "hashedPassword",
+        });
+
+        bcrypt.compare.mockResolvedValue(false);
+
+        await loginController(req, res);
+
+        expect(bcrypt.compare).toHaveBeenCalledWith("password123", "hashedPassword");
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Invalid Password",
+        });
+    });
+
+    it("should return a token if login is successful", async () => {
+        userModel.findOne.mockResolvedValue({
+            _id: "user123",
+            name: "John Doe",
+            email: "test@example.com",
+            phone: "1234567890",
+            address: "123 Street",
+            role: 0,
+            password: "hashedPassword",
+        });
+
+        bcrypt.compare.mockResolvedValue(true);
+        JWT.sign.mockReturnValue("mockToken123");
+
+        await loginController(req, res);
+
+        expect(bcrypt.compare).toHaveBeenCalledWith("password123", "hashedPassword");
+        expect(JWT.sign).toHaveBeenCalledWith(
+            { _id: "user123" },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: true,
+            message: "login successfully",
+            user: {
+                _id: "user123",
+                name: "John Doe",
+                email: "test@example.com",
+                phone: "1234567890",
+                address: "123 Street",
+                role: 0,
+            },
+            token: "mockToken123",
+        });
+    });
+
+    it("should return a 500 error if an exception occurs", async () => {
+        userModel.findOne.mockRejectedValue(new Error("Database error"));
+
+        await loginController(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Error in login",
             error: expect.any(Error),
         });
     });
