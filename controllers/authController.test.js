@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
-import { registerController, loginController, forgotPasswordController, testController } from "./authController.js";
+import { registerController, loginController, forgotPasswordController, testController, 
+    updateProfileController
+ } from "./authController.js";
 import userModel from "../models/userModel.js";
 import { jest } from "@jest/globals";
 
@@ -8,6 +10,7 @@ jest.spyOn(bcrypt, "hash");
 jest.spyOn(bcrypt, "compare")
 jest.spyOn(JWT, "sign");
 
+jest.spyOn(userModel, "findById");
 jest.spyOn(userModel, "findOne");
 jest.spyOn(userModel, "create");
 jest.spyOn(userModel, "findByIdAndUpdate");
@@ -353,5 +356,142 @@ describe("Test Controller", () => {
         } catch (error) {
             expect(error).toBe(errorMock);
         }
+    });
+});
+
+describe("Update Profile Controller", () => {
+    let req, res;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {
+            user: { _id: "user123" },
+            body: {
+                name: "John Doe",
+                email: "test@example.com",
+                password: "newPassword",
+                phone: "1234567890",
+                address: "123 Street",
+            },
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+        };
+    });
+
+    it("should return an error if password is less than 6 characters", async () => {
+        req.body.password = "12345"; // Too short
+        userModel.findById.mockResolvedValue(req.body)
+
+        await updateProfileController(req, res);
+
+        expect(userModel.findById).toHaveBeenCalledWith(req.user._id)
+
+        expect(res.send).toHaveBeenCalledWith({
+            error: "Passsword is required and 6 character long",
+        });
+    });
+
+    it("should update profile successfully without changing the password", async () => {
+        userModel.findById.mockResolvedValue({
+            _id: "user123",
+            name: "Old Name",
+            phone: "1111111111",
+            address: "Old Address",
+        });
+
+        userModel.findByIdAndUpdate.mockResolvedValue({
+            _id: "user123",
+            name: "John Doe",
+            phone: "1234567890",
+            address: "123 Street",
+        });
+
+        req.body.password = undefined; // No password update
+
+        await updateProfileController(req, res);
+
+        expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            "user123",
+            {
+                name: "John Doe",
+                password: undefined,
+                phone: "1234567890",
+                address: "123 Street",
+            },
+            { new: true }
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: true,
+            message: "Profile Updated SUccessfully",
+            updatedUser: expect.objectContaining({
+                _id: "user123",
+                name: "John Doe",
+                phone: "1234567890",
+                address: "123 Street",
+            }),
+        });
+    });
+
+    it("should update profile successfully with a new hashed password", async () => {
+        userModel.findById.mockResolvedValue({
+            _id: "user123",
+            name: "Old Name",
+            phone: "1111111111",
+            address: "Old Address",
+        });
+
+        bcrypt.hash.mockResolvedValue("hashedNewPassword");
+
+        userModel.findByIdAndUpdate.mockResolvedValue({
+            _id: "user123",
+            name: "John Doe",
+            phone: "1234567890",
+            address: "123 Street",
+            password: "hashedNewPassword",
+        });
+
+        await updateProfileController(req, res);
+
+        expect(bcrypt.hash).toHaveBeenCalledWith("newPassword", 10);
+        expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+            "user123",
+            {
+                name: "John Doe",
+                password: "hashedNewPassword",
+                phone: "1234567890",
+                address: "123 Street",
+            },
+            { new: true }
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith({
+            success: true,
+            message: "Profile Updated SUccessfully",
+            updatedUser: expect.objectContaining({
+                _id: "user123",
+                name: "John Doe",
+                phone: "1234567890",
+                address: "123 Street",
+                password: "hashedNewPassword",
+            }),
+        });
+    });
+
+    it("should return a 400 error if an exception occurs", async () => {
+        userModel.findById.mockRejectedValue(new Error("Database error"));
+
+        await updateProfileController(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Error WHile Update profile",
+            error: expect.any(Error),
+        });
     });
 });
