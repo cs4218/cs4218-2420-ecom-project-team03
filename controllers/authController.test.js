@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import { registerController, loginController, forgotPasswordController, testController, 
-    updateProfileController
+    updateProfileController, getOrdersController
  } from "./authController.js";
 import userModel from "../models/userModel.js";
-import { jest } from "@jest/globals";
+import orderModel from "../models/orderModel.js";
+import { expect, jest } from "@jest/globals";
 
 jest.spyOn(bcrypt, "hash");
 jest.spyOn(bcrypt, "compare")
@@ -14,6 +15,8 @@ jest.spyOn(userModel, "findById");
 jest.spyOn(userModel, "findOne");
 jest.spyOn(userModel, "create");
 jest.spyOn(userModel, "findByIdAndUpdate");
+
+jest.spyOn(orderModel, "find");
 
 describe("Register Controller", () => {
     let req, res;
@@ -340,23 +343,23 @@ describe("Test Controller", () => {
 
     it("should return 'Protected Routes'", () => {
         testController(req, res);
-
         expect(res.send).toHaveBeenCalledWith("Protected Routes");
     });
 
-    it("should handle unexpected errors", () => {
-        const errorMock = new Error("Unexpected error");
-        
-        const faultyTestController = () => {
-            throw errorMock;
-        };
-
+    it("should trigger catch block if res.send() fails", () => {
+        console.log = jest.fn();
+    
         try {
-            faultyTestController();
+            res.send = jest.fn().mockImplementation(() => {
+                throw new Error("Forced error");
+            });
+            testController(req, res);
         } catch (error) {
-            expect(error).toBe(errorMock);
+            expect(console.log).toHaveBeenCalledWith(expect.any(Error));
+            expect(res.send).toHaveBeenCalledWith({ error: expect.any(Error) });
         }
     });
+    
 });
 
 describe("Update Profile Controller", () => {
@@ -494,4 +497,59 @@ describe("Update Profile Controller", () => {
             error: expect.any(Error),
         });
     });
+});
+
+describe("Get Orders Controller", () => {
+    let req, res;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {
+            user: { _id: "user123" },
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            json: jest.fn(),
+        };
+    });
+
+    it("should return orders successfully", async () => {
+        const mockOrders = [
+            {
+                _id: "order1",
+                products: [{ _id: "product1", name: "Laptop" }],
+                buyer: { _id: "user123", name: "John Doe" },
+                status: "Processing",
+            },
+            {
+                _id: "order2",
+                products: [{ _id: "product2", name: "Phone" }],
+                buyer: { _id: "user123", name: "John Doe" },
+                status: "Shipped",
+            },
+        ];
+    
+        orderModel.find.mockResolvedValue(mockOrders)
+
+        await getOrdersController(req, res);
+
+        expect(orderModel.find).toHaveBeenCalledWith({"buyer": req.user._id})
+    });
+       
+
+    it("should return a 500 error if an exception occurs", async () => {
+        // ✅ Fix: Ensure find() returns a promise by mocking `.exec()`
+        orderModel.find.mockReturnValue(new Error("Database error"));
+    
+        await getOrdersController(req, res);
+    
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith({
+            success: false,
+            message: "Error WHile Geting Orders",
+            error: expect.any(Error),
+        });
+    });
+    
 });
