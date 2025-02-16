@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
-import { registerController, loginController, forgotPasswordController, testController, 
+import {
+    registerController, loginController, forgotPasswordController, testController,
     updateProfileController, getOrdersController
- } from "./authController.js";
+} from "./authController.js";
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
 import { expect, jest } from "@jest/globals";
@@ -348,7 +349,7 @@ describe("Test Controller", () => {
 
     it("should trigger catch block if res.send() fails", () => {
         console.log = jest.fn();
-    
+
         try {
             res.send = jest.fn().mockImplementation(() => {
                 throw new Error("Forced error");
@@ -359,7 +360,7 @@ describe("Test Controller", () => {
             expect(res.send).toHaveBeenCalledWith({ error: expect.any(Error) });
         }
     });
-    
+
 });
 
 describe("Update Profile Controller", () => {
@@ -502,48 +503,54 @@ describe("Update Profile Controller", () => {
 describe("Get Orders Controller", () => {
     let req, res;
 
+    const mockOrders = [
+        {
+            _id: "order1",
+            products: [{ _id: "product1", name: "Laptop" }],
+            buyer: { _id: "user123", name: "John Doe" },
+            status: "Processing",
+        },
+        {
+            _id: "order2",
+            products: [{ _id: "product2", name: "Phone" }],
+            buyer: { _id: "user123", name: "John Doe" },
+            status: "Shipped",
+        },
+    ];
+
+    const populateMocks = [
+        jest.fn(() => ({ populate: populateMocks[1] })),
+        jest.fn(() => (mockOrders)),
+    ];
+
     beforeEach(() => {
         jest.clearAllMocks();
-        req = {
-            user: { _id: "user123" },
-        };
+        req = { user: { _id: "user123" } };
         res = {
             status: jest.fn().mockReturnThis(),
             send: jest.fn(),
             json: jest.fn(),
         };
+
+        orderModel.find = jest.fn(() => ({ populate: populateMocks[0] }));
     });
 
     it("should return orders successfully", async () => {
-        const mockOrders = [
-            {
-                _id: "order1",
-                products: [{ _id: "product1", name: "Laptop" }],
-                buyer: { _id: "user123", name: "John Doe" },
-                status: "Processing",
-            },
-            {
-                _id: "order2",
-                products: [{ _id: "product2", name: "Phone" }],
-                buyer: { _id: "user123", name: "John Doe" },
-                status: "Shipped",
-            },
-        ];
-    
-        orderModel.find.mockResolvedValue(mockOrders)
-
         await getOrdersController(req, res);
 
-        expect(orderModel.find).toHaveBeenCalledWith({"buyer": req.user._id})
+        expect(orderModel.find).toHaveBeenCalledWith({ buyer: req.user._id });
+
+        expect(populateMocks[0]).toHaveBeenCalledWith("products", "-photo");
+        expect(populateMocks[1]).toHaveBeenCalledWith("buyer", "name");
+
+        expect(res.json).toHaveBeenCalledWith(mockOrders);
     });
-       
 
     it("should return a 500 error if an exception occurs", async () => {
-        // ✅ Fix: Ensure find() returns a promise by mocking `.exec()`
-        orderModel.find.mockReturnValue(new Error("Database error"));
-    
+        orderModel.find.mockReturnValue(new Error("Database error"))
+
         await getOrdersController(req, res);
-    
+
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.send).toHaveBeenCalledWith({
             success: false,
@@ -551,5 +558,5 @@ describe("Get Orders Controller", () => {
             error: expect.any(Error),
         });
     });
-    
 });
+
