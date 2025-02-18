@@ -1,6 +1,213 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1715086491438" clover="3.2.0">
-  <project timestamp="1715086491438" name="All files">
-    <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0" elements="0" coveredelements="0" complexity="0" loc="0" ncloc="0" packages="0" files="0" classes="0"/>
+<coverage generated="1739839142921" clover="3.2.0">
+  <project timestamp="1739839142921" name="All files">
+    <metrics statements="177" coveredstatements="71" conditionals="49" coveredconditionals="12" methods="54" coveredmethods="19" elements="280" coveredelements="102" complexity="0" loc="177" ncloc="177" packages="1" files="10" classes="10"/>
+    <file name="About.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\About.js">
+      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="4" count="0" type="stmt"/>
+      <line num="5" count="0" type="stmt"/>
+    </file>
+    <file name="CartPage.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\CartPage.js">
+      <metrics statements="48" coveredstatements="0" conditionals="22" coveredconditionals="0" methods="14" coveredmethods="0"/>
+      <line num="12" count="0" type="stmt"/>
+      <line num="13" count="0" type="stmt"/>
+      <line num="14" count="0" type="stmt"/>
+      <line num="15" count="0" type="stmt"/>
+      <line num="16" count="0" type="stmt"/>
+      <line num="17" count="0" type="stmt"/>
+      <line num="18" count="0" type="stmt"/>
+      <line num="21" count="0" type="stmt"/>
+      <line num="22" count="0" type="stmt"/>
+      <line num="23" count="0" type="stmt"/>
+      <line num="24" count="0" type="stmt"/>
+      <line num="25" count="0" type="stmt"/>
+      <line num="27" count="0" type="stmt"/>
+      <line num="32" count="0" type="stmt"/>
+      <line num="36" count="0" type="stmt"/>
+      <line num="37" count="0" type="stmt"/>
+      <line num="38" count="0" type="stmt"/>
+      <line num="39" count="0" type="stmt"/>
+      <line num="40" count="0" type="stmt"/>
+      <line num="41" count="0" type="stmt"/>
+      <line num="42" count="0" type="stmt"/>
+      <line num="44" count="0" type="stmt"/>
+      <line num="49" count="0" type="stmt"/>
+      <line num="50" count="0" type="stmt"/>
+      <line num="51" count="0" type="stmt"/>
+      <line num="52" count="0" type="stmt"/>
+      <line num="54" count="0" type="stmt"/>
+      <line num="57" count="0" type="stmt"/>
+      <line num="58" count="0" type="stmt"/>
+      <line num="62" count="0" type="stmt"/>
+      <line num="63" count="0" type="stmt"/>
+      <line num="64" count="0" type="stmt"/>
+      <line num="65" count="0" type="stmt"/>
+      <line num="66" count="0" type="stmt"/>
+      <line num="70" count="0" type="stmt"/>
+      <line num="71" count="0" type="stmt"/>
+      <line num="72" count="0" type="stmt"/>
+      <line num="73" count="0" type="stmt"/>
+      <line num="74" count="0" type="stmt"/>
+      <line num="76" count="0" type="stmt"/>
+      <line num="77" count="0" type="stmt"/>
+      <line num="80" count="0" type="stmt"/>
+      <line num="103" count="0" type="stmt"/>
+      <line num="121" count="0" type="stmt"/>
+      <line num="141" count="0" type="stmt"/>
+      <line num="152" count="0" type="stmt"/>
+      <line num="160" count="0" type="stmt"/>
+      <line num="182" count="0" type="stmt"/>
+    </file>
+    <file name="Categories.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\Categories.js">
+      <metrics statements="4" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <line num="5" count="0" type="stmt"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="12" count="0" type="stmt"/>
+    </file>
+    <file name="CategoryProduct.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\CategoryProduct.js">
+      <metrics statements="16" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="5" coveredmethods="0"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="8" count="0" type="stmt"/>
+      <line num="9" count="0" type="stmt"/>
+      <line num="10" count="0" type="stmt"/>
+      <line num="12" count="0" type="stmt"/>
+      <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="15" count="0" type="stmt"/>
+      <line num="16" count="0" type="stmt"/>
+      <line num="17" count="0" type="stmt"/>
+      <line num="20" count="0" type="stmt"/>
+      <line num="21" count="0" type="stmt"/>
+      <line num="23" count="0" type="stmt"/>
+      <line num="27" count="0" type="stmt"/>
+      <line num="36" count="0" type="stmt"/>
+      <line num="58" count="0" type="stmt"/>
+    </file>
+    <file name="Contact.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\Contact.js">
+      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="4" count="0" type="stmt"/>
+      <line num="5" count="0" type="stmt"/>
+    </file>
+    <file name="HomePage.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\HomePage.js">
+      <metrics statements="76" coveredstatements="52" conditionals="19" coveredconditionals="9" methods="21" coveredmethods="13"/>
+      <line num="12" count="1" type="stmt"/>
+      <line num="13" count="15" type="stmt"/>
+      <line num="14" count="15" type="stmt"/>
+      <line num="15" count="15" type="stmt"/>
+      <line num="16" count="14" type="stmt"/>
+      <line num="17" count="14" type="stmt"/>
+      <line num="18" count="14" type="stmt"/>
+      <line num="19" count="14" type="stmt"/>
+      <line num="20" count="14" type="stmt"/>
+      <line num="21" count="14" type="stmt"/>
+      <line num="24" count="14" type="stmt"/>
+      <line num="25" count="5" type="stmt"/>
+      <line num="26" count="5" type="stmt"/>
+      <line num="27" count="4" type="stmt"/>
+      <line num="28" count="4" type="cond" truecount="1" falsecount="1"/>
+      <line num="29" count="4" type="stmt"/>
+      <line num="32" count="1" type="stmt"/>
+      <line num="36" count="14" type="stmt"/>
+      <line num="37" count="5" type="stmt"/>
+      <line num="38" count="5" type="stmt"/>
+      <line num="41" count="14" type="stmt"/>
+      <line num="42" count="5" type="stmt"/>
+      <line num="43" count="5" type="stmt"/>
+      <line num="44" count="5" type="stmt"/>
+      <line num="45" count="4" type="stmt"/>
+      <line num="46" count="4" type="stmt"/>
+      <line num="47" count="4" type="stmt"/>
+      <line num="49" count="1" type="stmt"/>
+      <line num="50" count="1" type="stmt"/>
+      <line num="55" count="14" type="stmt"/>
+      <line num="56" count="5" type="stmt"/>
+      <line num="57" count="5" type="stmt"/>
+      <line num="58" count="4" type="stmt"/>
+      <line num="59" count="4" type="stmt"/>
+      <line num="61" count="1" type="stmt"/>
+      <line num="65" count="14" type="stmt"/>
+      <line num="66" count="5" type="cond" truecount="1" falsecount="1"/>
+      <line num="67" count="0" type="stmt"/>
+      <line num="70" count="14" type="stmt"/>
+      <line num="71" count="0" type="stmt"/>
+      <line num="72" count="0" type="stmt"/>
+      <line num="73" count="0" type="stmt"/>
+      <line num="74" count="0" type="stmt"/>
+      <line num="75" count="0" type="stmt"/>
+      <line num="76" count="0" type="stmt"/>
+      <line num="78" count="0" type="stmt"/>
+      <line num="79" count="0" type="stmt"/>
+      <line num="84" count="14" type="stmt"/>
+      <line num="85" count="0" type="stmt"/>
+      <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="87" count="0" type="stmt"/>
+      <line num="89" count="0" type="stmt"/>
+      <line num="91" count="0" type="stmt"/>
+      <line num="93" count="14" type="stmt"/>
+      <line num="94" count="5" type="cond" truecount="2" falsecount="2"/>
+      <line num="97" count="14" type="stmt"/>
+      <line num="98" count="5" type="cond" truecount="3" falsecount="1"/>
+      <line num="102" count="14" type="stmt"/>
+      <line num="103" count="0" type="stmt"/>
+      <line num="104" count="0" type="stmt"/>
+      <line num="108" count="0" type="stmt"/>
+      <line num="109" count="0" type="stmt"/>
+      <line num="111" count="0" type="stmt"/>
+      <line num="114" count="14" type="stmt"/>
+      <line num="129" count="12" type="stmt"/>
+      <line num="131" count="0" type="stmt"/>
+      <line num="140" count="0" type="stmt"/>
+      <line num="142" count="84" type="stmt"/>
+      <line num="151" count="0" type="stmt"/>
+      <line num="161" count="7" type="stmt"/>
+      <line num="183" count="1" type="stmt"/>
+      <line num="190" count="1" type="stmt"/>
+      <line num="191" count="1" type="stmt"/>
+      <line num="195" count="1" type="stmt"/>
+      <line num="210" count="0" type="stmt"/>
+      <line num="211" count="0" type="stmt"/>
+    </file>
+    <file name="Pagenotfound.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\Pagenotfound.js">
+      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="5" count="0" type="stmt"/>
+      <line num="6" count="0" type="stmt"/>
+    </file>
+    <file name="Policy.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\Policy.js">
+      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="4" count="0" type="stmt"/>
+      <line num="5" count="0" type="stmt"/>
+    </file>
+    <file name="ProductDetails.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\ProductDetails.js">
+      <metrics statements="21" coveredstatements="19" conditionals="4" coveredconditionals="3" methods="6" coveredmethods="6"/>
+      <line num="7" count="2" type="stmt"/>
+      <line num="8" count="11" type="stmt"/>
+      <line num="9" count="10" type="stmt"/>
+      <line num="10" count="10" type="stmt"/>
+      <line num="11" count="10" type="stmt"/>
+      <line num="14" count="10" type="stmt"/>
+      <line num="15" count="5" type="cond" truecount="1" falsecount="1"/>
+      <line num="18" count="10" type="stmt"/>
+      <line num="19" count="5" type="stmt"/>
+      <line num="20" count="5" type="stmt"/>
+      <line num="23" count="5" type="stmt"/>
+      <line num="24" count="5" type="stmt"/>
+      <line num="26" count="0" type="stmt"/>
+      <line num="30" count="10" type="stmt"/>
+      <line num="31" count="5" type="stmt"/>
+      <line num="32" count="5" type="stmt"/>
+      <line num="35" count="5" type="stmt"/>
+      <line num="37" count="0" type="stmt"/>
+      <line num="40" count="10" type="stmt"/>
+      <line num="76" count="4" type="stmt"/>
+      <line num="98" count="1" type="stmt"/>
+    </file>
+    <file name="Search.js" path="C:\Users\Zi Jia\OneDrive - National University of Singapore\Desktop\ONE FOLDER TO RULE THEM ALL\NUS\MODS\AY2425S2\CS4218\cs4218-2420-ecom-project-team03\client\src\pages\Search.js">
+      <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <line num="4" count="0" type="stmt"/>
+      <line num="5" count="0" type="stmt"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="18" count="0" type="stmt"/>
+    </file>
   </project>
 </coverage>

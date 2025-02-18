@@ -24,6 +24,7 @@ const HomePage = () => {
   const getAllCategory = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
+      console.log(data); // to be removed
       if (data?.success) {
         setCategories(data?.category);
       }
@@ -41,6 +42,7 @@ const HomePage = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      console.log(data); // to be removed
       setLoading(false);
       setProducts(data.products);
     } catch (error) {
@@ -53,6 +55,7 @@ const HomePage = () => {
   const getTotal = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
+      console.log(data); // to be removed
       setTotal(data?.total);
     } catch (error) {
       console.log(error);
@@ -68,6 +71,7 @@ const HomePage = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      console.log(data); // to be removed
       setLoading(false);
       setProducts([...products, ...data?.products]);
     } catch (error) {
@@ -101,6 +105,7 @@ const HomePage = () => {
         checked,
         radio,
       });
+      console.log(data); // to be removed
       setProducts(data?.products);
     } catch (error) {
       console.log(error);
