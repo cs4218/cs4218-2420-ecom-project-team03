@@ -1,9 +1,27 @@
 import { expect, jest } from "@jest/globals";
-import { createProductController } from "./productController";
+import { createProductController, getProductController } from "./productController";
 import productModel from "../models/productModel";
 
 jest.mock("../models/productModel.js");
 jest.mock("slugify");
+
+const LAPTOP_PRODUCT = {
+  name: "Laptop",
+  description: "A powerful laptop",
+  price: 1499.99, 
+  category: "66db427fdb0119d9234b27ed", 
+  quantity: 30,
+  shipping: true,
+};
+
+const SMARTPHONE_PRODUCT = {
+  name: "Smartphone",
+  description: "A high-end smartphone",
+  price: 99.99, 
+  category: "66db427fdb0119d9234b27ed", 
+  quantity: 500,
+  shipping: false,
+};
 
 describe("Product Controller", () => {
   let req, res;
@@ -26,15 +44,6 @@ describe("Product Controller", () => {
   })
 
   describe("createProductController", () => {
-    const LAPTOP_PRODUCT = {
-      name: "Laptop",
-      description: "A powerful laptop",
-      price: 1499.99, 
-      category: "66db427fdb0119d9234b27ed", 
-      quantity: 30,
-      shipping: true,
-    };
-
     const LAPTOP_PHOTO = {
       path: "example-path",
       type: "image/jpeg",
@@ -50,7 +59,7 @@ describe("Product Controller", () => {
       shipping: true
     };
 
-    it("should successfully create a new product", async () => {
+    it("should respond with a success when product creation is successful", async () => {
       req.fields = LAPTOP_PRODUCT;
 
       productModel.prototype.save = jest.fn().mockResolvedValueOnce();
@@ -67,7 +76,7 @@ describe("Product Controller", () => {
       expect(responseData.products.category.toString()).toBe(LAPTOP_PRODUCT.category);
     });
 
-    it("should fail when no name is given", async () => {
+    it("should respond with an error when no name is given", async () => {
       const { name, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -79,7 +88,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
     });
 
-    it("should fail when no description is given", async () => {
+    it("should respond with an error when no description is given", async () => {
       const { description, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -91,7 +100,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
     });
 
-    it("should fail when no price is given", async () => {
+    it("should respond with an error when no price is given", async () => {
       const { price, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -103,7 +112,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
     });
 
-    it("should fail when no category is given", async () => {
+    it("should respond with an error when no category is given", async () => {
       const { category, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -115,7 +124,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
     });
 
-    it("should fail when no quantity is given", async () => {
+    it("should respond with an error when no quantity is given", async () => {
       const { quantity, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -127,4 +136,59 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
     });
   });
+
+  describe("getProductController", () => {
+    it("should respond with a success containing all product details", async () => {
+      productModel.find     = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockReturnThis();
+      productModel.limit    = jest.fn().mockReturnThis();
+      productModel.sort     = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, SMARTPHONE_PRODUCT ]);
+
+      await getProductController(req, res);
+
+      expect(res.status).toBeCalledWith(200)
+      expect(res.send).toBeCalledWith({
+        success: true,
+        countTotal: 2,
+        message: "AllProducts ",
+        products: [ LAPTOP_PRODUCT, SMARTPHONE_PRODUCT ],
+      })
+    });
+
+    it("should respond with a success even if there are no products", async () => {
+      productModel.find     = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockReturnThis();
+      productModel.limit    = jest.fn().mockReturnThis();
+      productModel.sort     = jest.fn().mockResolvedValueOnce([]);
+
+      await getProductController(req, res);
+
+      expect(res.status).toBeCalledWith(200)
+      expect(res.send).toBeCalledWith({
+        success: true,
+        countTotal: 0,
+        message: "AllProducts ",
+        products: [],
+      })
+    });
+
+    it("should respond with an error if database retrieval throws an error", async () => {
+      productModel.find     = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockReturnThis();
+      productModel.limit    = jest.fn().mockReturnThis();
+      productModel.sort     = jest.fn().mockRejectedValueOnce({ message: "Database Error" });
+
+      await getProductController(req, res);
+
+      expect(res.status).toBeCalledWith(500);
+      expect(res.send).toBeCalledWith({
+        success: false,
+        message: "Error in getting products",
+        error: "Database Error",
+      });
+    });
+  })
 });
