@@ -1,5 +1,5 @@
 import { expect, jest } from "@jest/globals";
-import { createProductController, getProductController, getSingleProductController } from "./productController";
+import { createProductController, getProductController, getSingleProductController, productPhotoController } from "./productController";
 import productModel from "../models/productModel";
 
 jest.mock("../models/productModel.js");
@@ -36,6 +36,7 @@ describe("Product Controller", () => {
     res = {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
+      set: jest.fn(),
     };
   });
 
@@ -223,6 +224,44 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error while getting single product",
+        error: "Database Error",
+      });
+    });
+  });
+
+  describe("productPhotoController", () => {
+    it("should send a success if photo retrieval is successful", async () => {
+      req.params.pid = "mock-pid";
+      res.set = jest.fn().mockImplementationOnce((key, value) => {
+        res.contentType = value;
+      });
+
+      productModel.findById  = jest.fn().mockReturnThis();
+      productModel.select    = jest.fn().mockResolvedValueOnce({
+        photo: {
+          data: Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]),
+          contentType: "image/jpeg"
+        }
+      });
+      
+      await productPhotoController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.contentType).toBe("image/jpeg");
+      expect(res.send).toHaveBeenCalledWith(Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]));
+    });
+
+    it("should send an error if photo retrieval is unsuccessful", async () => {
+      req.params.pid = "mock-pid";
+      productModel.findById = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockRejectedValueOnce("Database Error");
+      
+      await productPhotoController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while getting photo",
         error: "Database Error",
       });
     });
