@@ -266,4 +266,42 @@ describe("Product Controller", () => {
       });
     });
   });
+
+  describe("deleteProductController", () => {
+    it("should send a success if product deletion is successful", async () => {
+      req.params.pid = "mock-pid";
+      res.set = jest.fn().mockImplementationOnce((key, value) => {
+        res.contentType = value;
+      });
+
+      productModel.findById  = jest.fn().mockReturnThis();
+      productModel.select    = jest.fn().mockResolvedValueOnce({
+        photo: {
+          data: Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]),
+          contentType: "image/jpeg"
+        }
+      });
+      
+      await productPhotoController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.contentType).toBe("image/jpeg");
+      expect(res.send).toHaveBeenCalledWith(Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]));
+    });
+
+    it("should send an error if product deletion is unsuccessful", async () => {
+      req.params.pid = "mock-pid";
+      productModel.findById = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockRejectedValueOnce("Database Error");
+      
+      await productPhotoController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while getting photo",
+        error: "Database Error",
+      });
+    });
+  });
 });
