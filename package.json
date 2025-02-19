@@ -50,6 +50,10 @@
     "sonarqube-scanner": "^3.3.0"
   },
   "jest": {
+    "projects": [
+      "jest.backend.config.js",
+      "jest.frontend.config.js"
+    ],
     "testEnvironment": "jest-environment-jsdom",
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
