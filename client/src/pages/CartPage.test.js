@@ -80,6 +80,7 @@ describe('CartPage Cart functions', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    consoleLogSpy.mockRestore();
   });
 
   // Test 1: Renders CartPage component
@@ -93,10 +94,11 @@ describe('CartPage Cart functions', () => {
     ));
 
     expect(getByText(/Hello Test User/i)).toBeInTheDocument();
+    expect(getByText(/Test Address/i)).toBeInTheDocument();
   });
 
   // Test 2: Renders CartPage component when cart is empty
-  it('renders CartPage component', async () => {
+  it('renders CartPage component with empty cart', async () => {
     //Mock empty cart
     useCart.mockReturnValue([[], jest.fn()]);
     const { getByText } = await act(async() => render(
@@ -108,6 +110,8 @@ describe('CartPage Cart functions', () => {
     ));
 
     expect(getByText(/Hello Test User/i)).toBeInTheDocument();
+    expect(getByText(/Test Address/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Cart Is Empty/i)).toBeInTheDocument();
   });
 
   // Test 3: Displays cart items
@@ -141,13 +145,14 @@ describe('CartPage Cart functions', () => {
     expect(totalPriceElement).toBeInTheDocument();
   });
 
-  // Test 5: Calculates total price correctly
-  it('calculates the total price correctly', async () => {
+  // Test 5: Handle error when price is invalid
+  it('handles errors in calculating price', async () => {
     //Mock cart with invalid priced item
     useCart.mockReturnValue([[
       { _id: '1', name: 'Product 1', price: 10, description: 'Description 1' },
-      { _id: '2', name: 'Product 2', price: "invalid price", description: 'Description 2' },
+      { _id: '2', name: 'Product 2', price: "invalid", description: 'Description 2' },
     ], jest.fn()]);
+
     await act(async() => render(
       <MemoryRouter initialEntries={['/cart']}>
         <Routes>
@@ -180,9 +185,7 @@ describe('CartPage Cart functions', () => {
     // Click the first "Remove" button
     fireEvent.click(removeButtons[0]);
 
-    const mockCartAfterRemoval = mockCart.filter(
-      (item) => item._id !== "1"
-    );
+    const mockCartAfterRemoval = mockCart.slice(1);
 
     expect(setCart).toHaveBeenCalledWith(mockCartAfterRemoval);
     expect(localStorage.setItem).toHaveBeenCalledWith(
@@ -192,7 +195,7 @@ describe('CartPage Cart functions', () => {
   });
 
   //Test 7: Error when removing cart items
-  it("No items removed from cart when error is thrown", async () => {
+  it("should not remove items from cart when error is thrown", async () => {
     const setCart = jest.fn().mockImplementationOnce(() => {
       throw new Error("Error when removing item");
     });
@@ -227,6 +230,7 @@ describe('CartPage Update Address function', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    consoleLogSpy.mockRestore();
   });
 
   //Test 8: Update Address button
@@ -250,7 +254,7 @@ describe('CartPage Update Address function', () => {
   });
 
   //Test 9: Update Address button when no user address
-  it("should display update address button even when user address is absent", async () => {
+  it("display update address button even when user address is absent", async () => {
     useAuth.mockReturnValue([
       {
         user: { name: 'Test User', address: '' },
@@ -290,6 +294,7 @@ describe('CartPage Payment function', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    consoleLogSpy.mockRestore();
   });
 
   // Test 10: Obtains payment gateway token
@@ -386,7 +391,7 @@ describe('CartPage Payment function', () => {
       });
       expect(setCart).toHaveBeenCalledWith([]);
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/orders");
-      expect(toast.success).toHaveBeenCalledWith("Payment Completed Successfully ");
+      expect(toast.success).toHaveBeenCalledWith("Payment Completed Successfully");
     });
   });
 
@@ -468,7 +473,7 @@ describe('CartPage when user is not logged in', () => {
   });
 
   //Test 14: No User
-  it('should bring user to Login page', async () => {
+  it('bring user to Login page when user is not yet logged in', async () => {
     await act(async() => render(
       <MemoryRouter initialEntries={['/cart']}>
         <Routes>
