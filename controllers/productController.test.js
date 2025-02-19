@@ -3,6 +3,7 @@ import {
   createProductController, 
   getProductController, 
   getSingleProductController, 
+  productFiltersController, 
   productPhotoController,
   updateProductController
 } from "./productController";
@@ -416,6 +417,90 @@ describe("Product Controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
+    });
+  });
+
+  describe("productFiltersController", () => {
+    it("should respond with a success when product filter by category and range is successful", async () => {
+      req.body = {
+        checked: "66db427fdb0119d9234b27ed",
+        radio: [100, 200]
+      }
+
+      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+
+      await productFiltersController(req, res);
+
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: "66db427fdb0119d9234b27ed",
+        price: { $gte: 100, $lte: 200 }
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Filtered Products Fetched",
+        products: [ LAPTOP_PRODUCT, BOOK_PRODUCT ],
+      });
+    });
+
+    it("should respond with a success when product filter by category is successful", async () => {
+      req.body = {
+        checked: "66db427fdb0119d9234b27ed",
+        radio: []
+      }
+
+      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+
+      await productFiltersController(req, res);
+
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: "66db427fdb0119d9234b27ed"
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Filtered Products Fetched",
+        products: [ LAPTOP_PRODUCT, BOOK_PRODUCT ],
+      });
+    });
+
+    it("should respond with a success when product filter by range is successful", async () => {
+      req.body = {
+        checked: "",
+        radio: [100, 200]
+      }
+
+      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+
+      await productFiltersController(req, res);
+
+      expect(productModel.find).toHaveBeenCalledWith({
+        price: { $gte: 100, $lte: 200 }
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Filtered Products Fetched",
+        products: [ LAPTOP_PRODUCT, BOOK_PRODUCT ],
+      });
+    });
+
+    it("should respond with an error when product filter is unsuccessful", async () => {
+      req.body = {
+        checked: "66db427fdb0119d9234b27ed",
+        radio: [100, 200]
+      }
+
+      productModel.find = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await productFiltersController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while filtering products",
+        error: "Database Error",
+      });
     });
   });
 });
