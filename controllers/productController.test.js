@@ -1,5 +1,11 @@
 import { expect, jest } from "@jest/globals";
-import { createProductController, getProductController, getSingleProductController, productPhotoController } from "./productController";
+import { 
+  createProductController, 
+  getProductController, 
+  getSingleProductController, 
+  productPhotoController,
+  updateProductController
+} from "./productController";
 import productModel from "../models/productModel";
 
 jest.mock("../models/productModel.js");
@@ -20,6 +26,15 @@ const SMARTPHONE_PRODUCT = {
   price: 99.99, 
   category: "66db427fdb0119d9234b27ed", 
   quantity: 500,
+  shipping: false,
+};
+
+const BOOK_PRODUCT = {
+  name: "Book",
+  description: "A thick book",
+  price: 10, 
+  category: "66db427fdb0119d9234b27ef", 
+  quantity: 1,
   shipping: false,
 };
 
@@ -302,6 +317,105 @@ describe("Product Controller", () => {
         message: "Error while getting photo",
         error: "Database Error",
       });
+    });
+  });
+
+  describe("updateProductController", () => {
+    it("should respond with a success when product update is successful", async () => {
+      req.fields = BOOK_PRODUCT;
+      req.params.pid = "mock-pid";
+
+      const bookModel = new productModel(BOOK_PRODUCT);
+      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(bookModel);
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      const responseData = res.send.mock.calls[0][0];
+      expect(responseData.success).toBeTruthy(); 
+      expect(responseData.products).toMatchObject({ 
+        ...BOOK_PRODUCT,
+        category: expect.any(Object)
+      });
+      expect(responseData.products.category.toString()).toBe(BOOK_PRODUCT.category);
+    });
+
+    it("should respond with a success when product update is successful", async () => {
+      req.fields = BOOK_PRODUCT;
+      req.params.pid = "mock-pid";
+
+      productModel.findByIdAndUpdate = jest.fn().mockRejectedValue("Database Error");
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: "Database Error",
+        message: "Error while updating product",
+      });
+    });
+
+    it("should respond with an error when no name is given", async () => {
+      const { name, ...rest } = LAPTOP_PRODUCT;
+      req.fields = rest;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+    });
+
+    it("should respond with an error when no description is given", async () => {
+      const { description, ...rest } = LAPTOP_PRODUCT;
+      req.fields = rest;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
+    });
+
+    it("should respond with an error when no price is given", async () => {
+      const { price, ...rest } = LAPTOP_PRODUCT;
+      req.fields = rest;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
+    });
+
+    it("should respond with an error when no category is given", async () => {
+      const { category, ...rest } = LAPTOP_PRODUCT;
+      req.fields = rest;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
+    });
+
+    it("should respond with an error when no quantity is given", async () => {
+      const { quantity, ...rest } = LAPTOP_PRODUCT;
+      req.fields = rest;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
     });
   });
 });

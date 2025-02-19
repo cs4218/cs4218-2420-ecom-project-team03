@@ -143,7 +143,7 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
-// upate producta
+// update product
 export const updateProductController = async (req, res) => {
   try {
     const { name, description, price, category, quantity, shipping } =
