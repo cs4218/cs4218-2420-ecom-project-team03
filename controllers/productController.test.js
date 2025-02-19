@@ -3,6 +3,7 @@ import {
   createProductController, 
   getProductController, 
   getSingleProductController, 
+  productCountController, 
   productFiltersController, 
   productPhotoController,
   updateProductController
@@ -500,6 +501,36 @@ describe("Product Controller", () => {
         success: false,
         message: "Error while filtering products",
         error: "Database Error",
+      });
+    });
+  });
+
+  describe("productCountController", () => {
+    it("should respond with a success when product count is successful", async () => {
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.estimatedDocumentCount = jest.fn().mockResolvedValueOnce(10);
+
+      await productCountController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Product count successful",
+        total: 10,
+      });
+    });
+
+    it("should respond with an error when product count is unsuccessful", async () => {
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.estimatedDocumentCount = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await productCountController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        message: "Error in product count",
+        error: "Database Error",
+        success: false,
       });
     });
   });

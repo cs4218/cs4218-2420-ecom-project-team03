@@ -221,11 +221,12 @@ export const productCountController = async (req, res) => {
     const total = await productModel.find({}).estimatedDocumentCount();
     res.status(200).send({
       success: true,
+      message: "Product count successful",
       total,
     });
   } catch (error) {
     console.log(error);
-    res.status(400).send({
+    res.status(500).send({
       message: "Error in product count",
       error,
       success: false,
