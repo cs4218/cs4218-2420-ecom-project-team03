@@ -5,6 +5,7 @@ import {
   getSingleProductController, 
   productCountController, 
   productFiltersController, 
+  productListController, 
   productPhotoController,
   updateProductController
 } from "./productController";
@@ -531,6 +532,73 @@ describe("Product Controller", () => {
         message: "Error in product count",
         error: "Database Error",
         success: false,
+      });
+    });
+  });
+
+  describe("productListController", () => {
+    const perPage = 6;
+    it("should respond with a success when getting first page of products", async () => {
+      req.params.page = 1;
+
+      const PRODUCTS = [
+        LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT
+      ];
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.skip   = jest.fn().mockReturnThis();
+      productModel.limit  = jest.fn().mockReturnThis();
+      productModel.sort   = jest.fn().mockResolvedValueOnce(PRODUCTS);
+
+      await productListController(req, res);
+
+      expect(productModel.skip).toHaveBeenCalledWith(0);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Product list for page 1 successful",
+        products: PRODUCTS,
+      });
+    });
+
+    it("should respond with a success when getting second page of products", async () => {
+      req.params.page = 2;
+
+      const PRODUCTS = [
+        SMARTPHONE_PRODUCT, SMARTPHONE_PRODUCT, SMARTPHONE_PRODUCT, SMARTPHONE_PRODUCT, SMARTPHONE_PRODUCT, SMARTPHONE_PRODUCT
+      ];
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.skip   = jest.fn().mockReturnThis();
+      productModel.limit  = jest.fn().mockReturnThis();
+      productModel.sort   = jest.fn().mockResolvedValueOnce(PRODUCTS);
+
+      await productListController(req, res);
+
+      expect(productModel.skip).toHaveBeenCalledWith(1 * perPage);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Product list for page 2 successful",
+        products: PRODUCTS,
+      });
+    });
+
+    it("should respond with an error when product list is unsuccessful", async () => {
+      req.params.page = 1;
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.skip   = jest.fn().mockReturnThis();
+      productModel.limit  = jest.fn().mockReturnThis();
+      productModel.sort   = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await productListController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error in per page ctrl",
+        error: "Database Error",
       });
     });
   });
