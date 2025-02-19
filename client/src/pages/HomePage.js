@@ -19,6 +19,7 @@ const HomePage = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [filtering, setFiltering] = useState(false);
 
   //get all cat
   const getAllCategory = async () => {
@@ -45,6 +46,7 @@ const HomePage = () => {
       console.log(data); // to be removed
       setLoading(false);
       setProducts(data.products);
+      setFiltering(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -91,7 +93,7 @@ const HomePage = () => {
     setChecked(all);
   };
   useEffect(() => {
-    if (!checked.length || !radio.length) getAllProducts();
+    if (checked.length === 0 && radio.length === 0) getAllProducts();
   }, [checked.length, radio.length]);
 
   useEffect(() => {
@@ -105,8 +107,9 @@ const HomePage = () => {
         checked,
         radio,
       });
-      console.log(data); // to be removed
+      console.log(radio); // to be removed
       setProducts(data?.products);
+      setFiltering(true);
     } catch (error) {
       console.log(error);
     }
@@ -203,7 +206,7 @@ const HomePage = () => {
             ))}
           </div>
           <div className="m-2 p-3">
-            {products && products.length < total && (
+            {products && !filtering && products.length < total && (
               <button
                 className="btn loadmore"
                 onClick={(e) => {
@@ -215,8 +218,7 @@ const HomePage = () => {
                   "Loading ..."
                 ) : (
                   <>
-                    {" "}
-                    Loadmore <AiOutlineReload />
+                    Load More <AiOutlineReload/>
                   </>
                 )}
               </button>
