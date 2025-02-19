@@ -1,5 +1,5 @@
 import { expect, jest } from "@jest/globals";
-import { createProductController, getProductController } from "./productController";
+import { createProductController, getProductController, getSingleProductController } from "./productController";
 import productModel from "../models/productModel";
 
 jest.mock("../models/productModel.js");
@@ -191,4 +191,40 @@ describe("Product Controller", () => {
       });
     });
   })
+
+  describe("getSingleProductController", () => {
+    it("should send a success if single product retrieval is successful", async () => {
+      req.params.slug = "laptop";
+      productModel.findOne  = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockResolvedValueOnce(LAPTOP_PRODUCT);
+      
+      await getSingleProductController(req, res);
+
+      expect(productModel.findOne).toHaveBeenCalledWith({ slug: "laptop" });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Single Product Fetched",
+        product: LAPTOP_PRODUCT,
+      });
+    });
+
+    it("should send an error if single product retrieval is unsuccessful", async () => {
+      req.params.slug = "laptop";
+      productModel.findOne  = jest.fn().mockReturnThis();
+      productModel.select   = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockRejectedValueOnce("Database Error");
+      
+      await getSingleProductController(req, res);
+
+      expect(productModel.findOne).toHaveBeenCalledWith({ slug: "laptop" });
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while getting single product",
+        error: "Database Error",
+      });
+    });
+  });
 });
