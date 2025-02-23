@@ -12,14 +12,20 @@ const Header = () => {
   const [cart] = useCart();
   const categories = useCategory();
   const handleLogout = () => {
-    setAuth({
-      ...auth,
-      user: null,
-      token: "",
-    });
-    localStorage.removeItem("auth");
-    toast.success("Logout Successfully");
+    try {
+      setAuth({
+        ...auth,
+        user: null,
+        token: "",
+      });
+      localStorage.removeItem("auth");
+      toast.success("Logout Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Logout Failed");
+    }
   };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -55,13 +61,13 @@ const Header = () => {
                   Categories
                 </Link>
                 <ul className="dropdown-menu">
-                  <li>
+                  <li key="all-categories">
                     <Link className="dropdown-item" to={"/categories"}>
                       All Categories
                     </Link>
                   </li>
                   {categories?.map((c) => (
-                    <li>
+                    <li key={c.slug}>
                       <Link
                         className="dropdown-item"
                         to={`/category/${c.slug}`}
