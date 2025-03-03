@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { useAuth, AuthProvider } from '../context/auth';
-import { useCart, CartProvider } from '../context/cart';
+import { useAuth } from '../context/auth';
+import { useCart } from '../context/cart';
 import CartPage from './CartPage';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -465,7 +465,6 @@ describe('CartPage when user is not logged in', () => {
       user: null,
       token: null,
     }, jest.fn()]);
-    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {
