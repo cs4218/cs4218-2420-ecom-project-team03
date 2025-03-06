@@ -26,7 +26,7 @@ const CreateCategory = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("somthing went wrong in input form");
+      toast.error("Something went wrong in input form");
     }
   };
 
@@ -39,7 +39,7 @@ const CreateCategory = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error("Something went wrong in getting category");
     }
   };
 
@@ -65,7 +65,7 @@ const CreateCategory = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Somtihing went wrong");
+      toast.error("Something went wrong");
     }
   };
   //delete category
@@ -82,7 +82,7 @@ const CreateCategory = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Somtihing went wrong");
+      toast.error("Something went wrong");
     }
   };
   return (
@@ -94,14 +94,14 @@ const CreateCategory = () => {
           </div>
           <div className="col-md-9">
             <h1>Manage Category</h1>
-            <div className="p-3 w-50">
+            <div className="p-3 w-50" data-testid="create-category-form">
               <CategoryForm
                 handleSubmit={handleSubmit}
                 value={name}
                 setValue={setName}
               />
             </div>
-            <div className="w-75">
+            <div className="w-75" data-testid="category-table">
               <table className="table">
                 <thead>
                   <tr>
@@ -111,31 +111,29 @@ const CreateCategory = () => {
                 </thead>
                 <tbody>
                   {categories?.map((c) => (
-                    <>
-                      <tr>
-                        <td key={c._id}>{c.name}</td>
-                        <td>
-                          <button
-                            className="btn btn-primary ms-2"
-                            onClick={() => {
-                              setVisible(true);
-                              setUpdatedName(c.name);
-                              setSelected(c);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-danger ms-2"
-                            onClick={() => {
-                              handleDelete(c._id);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    </>
+                    <tr key={c._id}>
+                      <td>{c.name}</td>
+                      <td>
+                        <button
+                          className="btn btn-primary ms-2"
+                          onClick={() => {
+                            setVisible(true);
+                            setUpdatedName(c.name);
+                            setSelected(c);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger ms-2"
+                          onClick={() => {
+                            handleDelete(c._id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -143,13 +141,15 @@ const CreateCategory = () => {
             <Modal
               onCancel={() => setVisible(false)}
               footer={null}
-              visible={visible}
+              open={visible}
             >
-              <CategoryForm
-                value={updatedName}
-                setValue={setUpdatedName}
-                handleSubmit={handleUpdate}
-              />
+              <div data-testid="update-category-form">
+                <CategoryForm
+                  value={updatedName}
+                  setValue={setUpdatedName}
+                  handleSubmit={handleUpdate}
+                />
+              </div>
             </Modal>
           </div>
         </div>
