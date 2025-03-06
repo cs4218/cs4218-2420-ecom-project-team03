@@ -96,6 +96,33 @@ describe("CreateCategory Component", () => {
     });
   });
 
+  it("handles creating a new category using an existing category name", async () => {
+    // Return a valid response object, but with success false
+    axios.post.mockResolvedValue({
+      data: { success: false, message: "Category already exists" },
+    });
+  
+    render(
+      <MemoryRouter>
+        <CreateCategory />
+      </MemoryRouter>
+    );
+  
+    const createCategoryForm = screen.getByTestId("create-category-form");
+    const input = within(createCategoryForm).getByPlaceholderText("Enter new category");
+    const submitButton = within(createCategoryForm).getByText("Submit");
+  
+    fireEvent.change(input, { target: { value: "Mocked Electronics" } });
+    fireEvent.click(submitButton);
+  
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith("/api/v1/category/create-category", {
+        name: "Mocked Electronics",
+      });
+      expect(toast.error).toHaveBeenCalledWith("Category already exists");
+    });
+  });
+
   it("submits create new category form", async () => {
     axios.post.mockResolvedValue({
       data: { success: true, message: "new category created" },
@@ -206,6 +233,35 @@ describe("CreateCategory Component", () => {
     });
   });
 
+  it("handles updating a category name using an existing category name", async () => {
+    axios.put.mockResolvedValue({
+      data: { success: false, message: "Category already exists" },
+    });
+
+    render(
+      <MemoryRouter>
+        <CreateCategory />
+      </MemoryRouter>
+    );
+
+    const editButton = await screen.findByText("Edit");
+    fireEvent.click(editButton);
+
+    const updateForm = screen.getByTestId("update-category-form");
+    const updateInput = within(updateForm).getByDisplayValue(mockCategories[0].name);
+    const updateSubmitButton = within(updateForm).getByText("Submit");
+
+    fireEvent.change(updateInput, { target: { value: "Mocked Electronics" } });
+    fireEvent.click(updateSubmitButton);
+
+    await waitFor(() => {
+      expect(axios.put).toHaveBeenCalledWith("/api/v1/category/update-category/1", {
+        name: "Mocked Electronics",
+      });
+      expect(toast.error).toHaveBeenCalledWith("Category already exists");
+    });
+  });
+
   it("deletes a category successfully", async () => {
     axios.delete.mockResolvedValue({
       data: { success: true, message: "category is deleted" },
@@ -240,6 +296,25 @@ describe("CreateCategory Component", () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+    });
+  });
+
+  it("handles deleting a category with invalid id", async () => {
+    axios.delete.mockResolvedValue({
+      data: { success: false, message: "Error while deleting category" },
+    });
+
+    render(
+      <MemoryRouter>
+        <CreateCategory />
+      </MemoryRouter>
+    );
+
+    const deleteButton = await screen.findByText("Delete");
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Error while deleting category");
     });
   });
 });
