@@ -10,11 +10,14 @@ import {
   productPhotoController,
   updateProductController,
   searchProductController,
-  relatedProductController
+  relatedProductController,
+  productCategoryController
 } from "./productController";
 import productModel from "../models/productModel";
+import categoryModel from "../models/categoryModel";
 
 jest.mock("../models/productModel.js");
+jest.mock("../models/categoryModel.js");
 // jest.mock("slugify");
 
 const LAPTOP_PRODUCT = {
@@ -728,6 +731,114 @@ describe("Product Controller", () => {
         success: false,
         message: "Error while getting related product",
         error: "Database Error"
+      });
+    });
+  });
+
+  describe("productCategoryController", () => {
+    it("should respond with a 200 if there are products for the category", async () => {
+      const mock_slug = "electronics";
+      req.params.slug = mock_slug;
+
+      const category = new categoryModel({
+        _id: "66db427fdb0119d9234b27f3",
+        name: "electronics",
+        slug: "electronics"
+      });
+      const mock_products = [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT];
+      categoryModel.findOne = jest.fn().mockResolvedValueOnce(category);
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockResolvedValueOnce(mock_products);
+
+      await productCategoryController(req, res);
+
+      expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: mock_slug });
+      expect(productModel.find).toHaveBeenCalledWith({ category });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Products Fetched Successfully",
+        category: category,
+        products: mock_products,
+      });
+    });
+
+    it("should respond with a 204 if there are no products for the category", async () => {
+      const mock_slug = "electronics";
+      req.params.slug = mock_slug;
+
+      const category = new categoryModel({
+        _id: "66db427fdb0119d9234b27f3",
+        name: "electronics",
+        slug: "electronics"
+      });
+      const mock_products = [];
+      categoryModel.findOne = jest.fn().mockResolvedValueOnce(category);
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockResolvedValueOnce(mock_products);
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "No Products Found",
+        category: category,
+        products: mock_products,
+      });
+    });
+
+    it("should respond with a 400 if there no category is found", async () => {
+      const mock_slug = "electronics";
+      req.params.slug = mock_slug;
+
+      categoryModel.findOne = jest.fn().mockResolvedValueOnce(null);
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid category",
+      });
+    });
+
+    it("should respond with a 500 if there is a database error for the first query", async () => {
+      const mock_slug = "electronics";
+      req.params.slug = mock_slug;
+
+      categoryModel.findOne = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: "Database Error",
+        message: "Error while getting products",
+      });
+    });
+
+    it("should respond with a 500 if there is a database error for the second query", async () => {
+      const mock_slug = "electronics";
+      req.params.slug = mock_slug;
+      
+      const category = new categoryModel({
+        _id: "66db427fdb0119d9234b27f3",
+        name: "electronics",
+        slug: "electronics"
+      });
+      categoryModel.findOne = jest.fn().mockResolvedValueOnce(category);
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await productCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: "Database Error",
+        message: "Error while getting products",
       });
     });
   });
