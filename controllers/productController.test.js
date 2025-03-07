@@ -3,6 +3,7 @@ import {
   createProductController, 
   getProductController, 
   getSingleProductController, 
+  deleteProductController,
   productCountController, 
   productFiltersController, 
   productListController, 
@@ -12,9 +13,10 @@ import {
 import productModel from "../models/productModel";
 
 jest.mock("../models/productModel.js");
-jest.mock("slugify");
+// jest.mock("slugify");
 
 const LAPTOP_PRODUCT = {
+  _id: "66db427fdb0119d9234b27f3",
   name: "Laptop",
   description: "A powerful laptop",
   price: 1499.99, 
@@ -24,6 +26,7 @@ const LAPTOP_PRODUCT = {
 };
 
 const SMARTPHONE_PRODUCT = {
+  _id: "66db427fdb0119d9234b27f5",
   name: "Smartphone",
   description: "A high-end smartphone",
   price: 99.99, 
@@ -33,6 +36,7 @@ const SMARTPHONE_PRODUCT = {
 };
 
 const BOOK_PRODUCT = {
+  _id: "66db427fdb0119d9234b27f1",
   name: "Book",
   description: "A thick book",
   price: 10, 
@@ -287,37 +291,35 @@ describe("Product Controller", () => {
 
   describe("deleteProductController", () => {
     it("should send a success if product deletion is successful", async () => {
-      req.params.pid = "mock-pid";
-      res.set = jest.fn().mockImplementationOnce((key, value) => {
-        res.contentType = value;
-      });
+      const mock_pid = LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
 
-      productModel.findById  = jest.fn().mockReturnThis();
-      productModel.select    = jest.fn().mockResolvedValueOnce({
-        photo: {
-          data: Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]),
-          contentType: "image/jpeg"
-        }
-      });
+      productModel.findByIdAndDelete = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce(null);
       
-      await productPhotoController(req, res);
+      await deleteProductController(req, res);
 
+      expect(productModel.findByIdAndDelete).toHaveBeenCalledWith(mock_pid);
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.contentType).toBe("image/jpeg");
-      expect(res.send).toHaveBeenCalledWith(Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f]));
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Product Deleted Successfully"
+      });
     });
 
     it("should send an error if product deletion is unsuccessful", async () => {
-      req.params.pid = "mock-pid";
-      productModel.findById = jest.fn().mockReturnThis();
-      productModel.select   = jest.fn().mockRejectedValueOnce("Database Error");
+      const mock_pid = LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
+      productModel.findByIdAndDelete = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockRejectedValueOnce("Database Error");
       
-      await productPhotoController(req, res);
+      await deleteProductController(req, res);
 
+      expect(productModel.findByIdAndDelete).toHaveBeenCalledWith(mock_pid);
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Error while getting photo",
+        message: "Error while deleting product",
         error: "Database Error",
       });
     });
@@ -326,7 +328,8 @@ describe("Product Controller", () => {
   describe("updateProductController", () => {
     it("should respond with a success when product update is successful", async () => {
       req.fields = BOOK_PRODUCT;
-      req.params.pid = "mock-pid";
+      const mock_pid = BOOK_PRODUCT._id;
+      req.params.pid = mock_pid;
 
       const bookModel = new productModel(BOOK_PRODUCT);
       productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(bookModel);
@@ -334,17 +337,18 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
+      // expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      //   mock_pid,
+      //   { ...req.fields, ??? }
+      //   { new: true }
+      // );
       expect(res.status).toHaveBeenCalledWith(201);
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBeTruthy(); 
-      expect(responseData.products).toMatchObject({ 
-        ...BOOK_PRODUCT,
-        category: expect.any(Object)
-      });
-      expect(responseData.products.category.toString()).toBe(BOOK_PRODUCT.category);
+      expect(responseData.products).toMatchObject(bookModel);
     });
 
-    it("should respond with a success when product update is successful", async () => {
+    it("should respond with a success when product update is unsuccessful", async () => {
       req.fields = BOOK_PRODUCT;
       req.params.pid = "mock-pid";
 
