@@ -9,7 +9,8 @@ import {
   productListController, 
   productPhotoController,
   updateProductController,
-  searchProductController
+  searchProductController,
+  relatedProductController
 } from "./productController";
 import productModel from "../models/productModel";
 
@@ -614,7 +615,7 @@ describe("Product Controller", () => {
       const mock_keyword = "mock";
       req.params.keyword = mock_keyword;
 
-      const matching_products = [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT]
+      const matching_products = [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT];
       
       productModel.find = jest.fn().mockReturnThis();
       productModel.select = jest.fn().mockResolvedValueOnce(matching_products);
@@ -654,6 +655,79 @@ describe("Product Controller", () => {
         success: false,
         message: "Error in search product API",
         error: "Database Error",
+      });
+    });
+  });
+
+  describe("relatedProductController", () => {
+    it("should respond with a 200 if there are related products", async () => {
+      const mock_pid = LAPTOP_PRODUCT._id;
+      const mock_cid = LAPTOP_PRODUCT.category;
+      req.params.pid = mock_pid;
+      req.params.cid = mock_cid;
+
+      const related_products = [SMARTPHONE_PRODUCT];
+
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.limit = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockResolvedValueOnce(related_products);
+
+      await relatedProductController(req, res);
+
+      expect(productModel.find).toHaveBeenCalledWith({
+        category: mock_cid,
+        _id: { $ne: mock_pid }
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Related Products Fetched",
+        products: related_products
+      });
+    });
+
+    it("should respond with a 204 if there are no related products", async () => {
+      const mock_pid = LAPTOP_PRODUCT._id;
+      const mock_cid = LAPTOP_PRODUCT.category;
+      req.params.pid = mock_pid;
+      req.params.cid = mock_cid;
+
+      const empty_products = [];
+
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.limit = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockResolvedValueOnce(empty_products);
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "No Related Products Found",
+        products: empty_products
+      });
+    });
+
+    it("should respond with a 500 if there is a database error", async () => {
+      const mock_pid = LAPTOP_PRODUCT._id;
+      const mock_cid = LAPTOP_PRODUCT.category;
+      req.params.pid = mock_pid;
+      req.params.cid = mock_cid;
+
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.limit = jest.fn().mockReturnThis();
+      productModel.populate = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error while getting related product",
+        error: "Database Error"
       });
     });
   });

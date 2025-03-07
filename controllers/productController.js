@@ -288,7 +288,7 @@ export const searchProductController = async (req, res) => {
 };
 
 // similar products
-export const realtedProductController = async (req, res) => {
+export const relatedProductController = async (req, res) => {
   try {
     const { pid, cid } = req.params;
     const products = await productModel
@@ -299,15 +299,25 @@ export const realtedProductController = async (req, res) => {
       .select("-photo")
       .limit(3)
       .populate("category");
-    res.status(200).send({
-      success: true,
-      products,
-    });
+    
+    if (products.length > 0) {
+      res.status(200).send({
+        success: true,
+        message: "Related Products Fetched",
+        products,
+      });
+    } else {
+      res.status(204).send({
+        success: true,
+        message: "No Related Products Found",
+        products,
+      });
+    }
   } catch (error) {
     console.log(error);
-    res.status(400).send({
+    res.status(500).send({
       success: false,
-      message: "Error while geting related product",
+      message: "Error while getting related product",
       error,
     });
   }
