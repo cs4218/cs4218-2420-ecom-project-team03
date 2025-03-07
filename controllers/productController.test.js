@@ -8,7 +8,8 @@ import {
   productFiltersController, 
   productListController, 
   productPhotoController,
-  updateProductController
+  updateProductController,
+  searchProductController
 } from "./productController";
 import productModel from "../models/productModel";
 
@@ -59,6 +60,7 @@ describe("Product Controller", () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
       set: jest.fn(),
+      json: jest.fn()
     };
   });
 
@@ -602,6 +604,55 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error in per page ctrl",
+        error: "Database Error",
+      });
+    });
+  });
+
+  describe("searchProductController", () => {
+    it("should respond with a success if some products match keyword", async () => {
+      const mock_keyword = "mock";
+      req.params.keyword = mock_keyword;
+
+      const matching_products = [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT]
+      
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce(matching_products);
+
+      await searchProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(matching_products);
+    });
+
+    it("should respond with a success if no products match keyword", async () => {
+      const mock_keyword = "mock";
+      req.params.keyword = mock_keyword;
+
+      const empty_products = [];
+      
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce(empty_products);
+
+      await searchProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.json).toHaveBeenCalledWith(empty_products);
+    });
+
+    it("should respond with an error if search is unsuccessful", async () => {
+      const mock_keyword = "mock";
+      req.params.keyword = mock_keyword;
+      
+      productModel.find = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await searchProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Error in search product API",
         error: "Database Error",
       });
     });
