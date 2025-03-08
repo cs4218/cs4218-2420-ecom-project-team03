@@ -423,6 +423,35 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(UPDATED_LAPTOP_PRODUCT.category);
     });
 
+    it("should respond with a success when updating with no photo", async () => {
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
+
+      const laptopModel = new productModel(UPDATED_LAPTOP_PRODUCT);
+      // Return a productModel instance to ensure that save() can be called
+      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(laptopModel);
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        mock_pid,
+        { ...req.fields, slug: expect.any(String) },
+        { new: true }
+      );
+      expect(res.status).toHaveBeenCalledWith(201);
+      const responseData = res.send.mock.calls[0][0];
+      expect(responseData.success).toBeTruthy(); 
+      const receivedProduct = responseData.products;
+      expect(receivedProduct).toMatchObject({
+        ...UPDATED_LAPTOP_PRODUCT,
+        _id: expect.any(mongoose.Types.ObjectId),
+        category: expect.any(mongoose.Types.ObjectId)
+      });
+      expect(receivedProduct.category.toString()).toBe(UPDATED_LAPTOP_PRODUCT.category);
+    });
+
     it("should respond with an error when photo size exceeds 1mb", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
       const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
@@ -435,12 +464,30 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "photo should be less then 1mb" });
     });
 
-    it("should respond with a success when product update is unsuccessful", async () => {
-      req.fields = BOOK_PRODUCT;
+    it("should respond with a success if there is a database error with the query", async () => {
+      req.fields = LAPTOP_PRODUCT;
       req.params.pid = "mock-pid";
 
       productModel.findByIdAndUpdate = jest.fn().mockRejectedValue("Database Error");
       productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: "Database Error",
+        message: "Error while updating product",
+      });
+    });
+
+    it("should respond with an error if there is a database error with updating", async () => {
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      req.params.pid = "mock-pid";
+
+      const laptopModel = new productModel(UPDATED_LAPTOP_PRODUCT);
+      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(laptopModel);
+      productModel.prototype.save = jest.fn().mockRejectedValueOnce("Database Error");
 
       await updateProductController(req, res);
 
