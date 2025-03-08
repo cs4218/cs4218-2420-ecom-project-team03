@@ -1,5 +1,6 @@
 import { expect, jest } from "@jest/globals";
 import { 
+  gateway,
   createProductController, 
   getProductController, 
   getSingleProductController, 
@@ -13,7 +14,6 @@ import {
   relatedProductController,
   productCategoryController,
   braintreeTokenController,
-  gateway,
   brainTreePaymentController
 } from "./productController";
 import productModel from "../models/productModel";
@@ -102,7 +102,7 @@ describe("Product Controller", () => {
   })
 
   describe("createProductController", () => {
-    it("should respond with a success when product creation is successful", async () => {
+    it("should respond with a 201 when product creation is successful", async () => {
       req.fields = LAPTOP_PRODUCT;
       req.files = { photo: VALID_LAPTOP_PHOTO };
 
@@ -128,7 +128,7 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(LAPTOP_PRODUCT.category);
     });
 
-    it("should respond with a success when product is created with no photo", async () => {
+    it("should respond with a 201 when product is created with no photo", async () => {
       req.fields = LAPTOP_PRODUCT;
 
       productModel.prototype.save = jest.fn().mockResolvedValueOnce();
@@ -148,7 +148,7 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(LAPTOP_PRODUCT.category);
     });
 
-    it("should respond with an error when product photo is greater than 1mb", async () => {
+    it("should respond with a 400 when product photo is greater than 1mb", async () => {
       req.fields = LAPTOP_PRODUCT;
       req.files = { photo: INVALID_SIZE_LAPTOP_PHOTO };
 
@@ -162,7 +162,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when there is a database error", async () => {
+    it("should respond with a 500 when there is a database error", async () => {
       req.fields = LAPTOP_PRODUCT;
       req.files = { photo: VALID_LAPTOP_PHOTO };
 
@@ -181,7 +181,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when no name is given", async () => {
+    it("should respond with a 400 when no name is given", async () => {
       const { name, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -193,7 +193,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
     });
 
-    it("should respond with an error when no description is given", async () => {
+    it("should respond with a 400 when no description is given", async () => {
       const { description, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -205,7 +205,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
     });
 
-    it("should respond with an error when no price is given", async () => {
+    it("should respond with a 400 when no price is given", async () => {
       const { price, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -217,7 +217,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
     });
 
-    it("should respond with an error when no category is given", async () => {
+    it("should respond with a 400 when no category is given", async () => {
       const { category, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -229,7 +229,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
     });
 
-    it("should respond with an error when no quantity is given", async () => {
+    it("should respond with a 400 when no quantity is given", async () => {
       const { quantity, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -243,7 +243,7 @@ describe("Product Controller", () => {
   });
 
   describe("getProductController", () => {
-    it("should respond with a success containing all product details", async () => {
+    it("should respond with a 200 containing all product details", async () => {
       productModel.find     = jest.fn().mockReturnThis();
       productModel.populate = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
@@ -261,7 +261,7 @@ describe("Product Controller", () => {
       })
     });
 
-    it("should respond with a success even if there are no products", async () => {
+    it("should respond with a 200 even when there are no products", async () => {
       productModel.find     = jest.fn().mockReturnThis();
       productModel.populate = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
@@ -279,7 +279,7 @@ describe("Product Controller", () => {
       })
     });
 
-    it("should respond with an error if database retrieval throws an error", async () => {
+    it("should respond with a 500 when there is a database error", async () => {
       productModel.find     = jest.fn().mockReturnThis();
       productModel.populate = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
@@ -298,7 +298,7 @@ describe("Product Controller", () => {
   })
 
   describe("getSingleProductController", () => {
-    it("should send a success if single product retrieval is successful", async () => {
+    it("should respond with a 200 when single product retrieval is successful", async () => {
       req.params.slug = "laptop";
       productModel.findOne  = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
@@ -315,7 +315,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send an error if single product retrieval is unsuccessful", async () => {
+    it("should respond with a 500 when single product retrieval is unsuccessful", async () => {
       req.params.slug = "laptop";
       productModel.findOne  = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
@@ -334,7 +334,7 @@ describe("Product Controller", () => {
   });
 
   describe("productPhotoController", () => {
-    it("should send a 200 if photo retrieval is successful", async () => {
+    it("should send a 200 when photo retrieval is successful", async () => {
       req.params.pid = "mock-pid";
       res.set = jest.fn().mockImplementationOnce((key, value) => {
         res.contentType = value;
@@ -359,7 +359,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send a 400 if no product correlates to the pid given", async () => {
+    it("should send a 400 when no product correlates to the pid given", async () => {
       req.params.pid = "mock-pid";
       res.set = jest.fn().mockImplementationOnce((key, value) => {
         res.contentType = value;
@@ -376,7 +376,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send a 204 if there is no photo for the pid given", async () => {
+    it("should send a 204 when there is no photo for the pid given", async () => {
       req.params.pid = "mock-pid";
   
       productModel.findById = jest.fn().mockResolvedValueOnce({
@@ -392,7 +392,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send a 204 if there is no photo data for the pid given", async () => {
+    it("should send a 204 when there is no photo data for the pid given", async () => {
       req.params.pid = "mock-pid";
   
       productModel.findById = jest.fn().mockResolvedValueOnce({
@@ -411,7 +411,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send a 500 if photo retrieval is unsuccessful", async () => {
+    it("should send a 500 when photo retrieval is unsuccessful", async () => {
       req.params.pid = "mock-pid";
       productModel.findById = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockRejectedValueOnce("Database Error");
@@ -428,7 +428,7 @@ describe("Product Controller", () => {
   });
 
   describe("deleteProductController", () => {
-    it("should send a success if product deletion is successful", async () => {
+    it("should send a success when product deletion is successful", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
 
@@ -445,7 +445,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send an error if product deletion is unsuccessful", async () => {
+    it("should send an error when product deletion is unsuccessful", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
       productModel.findByIdAndDelete = jest.fn().mockReturnThis();
@@ -464,7 +464,7 @@ describe("Product Controller", () => {
   });
 
   describe("updateProductController", () => {
-    it("should respond with a success when product update is successful", async () => {
+    it("should respond with a 201 when product update is successful", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
       const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
@@ -499,7 +499,7 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(UPDATED_LAPTOP_PRODUCT.category);
     });
 
-    it("should respond with a success when updating with no photo", async () => {
+    it("should respond with a 201 when updating with no photo", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
       const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
@@ -528,7 +528,7 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(UPDATED_LAPTOP_PRODUCT.category);
     });
 
-    it("should respond with an error when photo size exceeds 1mb", async () => {
+    it("should respond with a 400 when photo size exceeds 1mb", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
       const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
@@ -540,7 +540,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "photo should be less then 1mb" });
     });
 
-    it("should respond with a success if there is a database error with the query", async () => {
+    it("should respond with a 500 when there is a database error with the query", async () => {
       req.fields = LAPTOP_PRODUCT;
       req.params.pid = "mock-pid";
 
@@ -557,7 +557,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error if there is a database error with updating", async () => {
+    it("should respond with a 500 when there is a database error with updating", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
       req.params.pid = "mock-pid";
 
@@ -575,7 +575,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when no name is given", async () => {
+    it("should respond with a 400 when no name is given", async () => {
       const { name, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -587,7 +587,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
     });
 
-    it("should respond with an error when no description is given", async () => {
+    it("should respond with a 400 when no description is given", async () => {
       const { description, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -599,7 +599,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
     });
 
-    it("should respond with an error when no price is given", async () => {
+    it("should respond with a 400 when no price is given", async () => {
       const { price, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -611,7 +611,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
     });
 
-    it("should respond with an error when no category is given", async () => {
+    it("should respond with a 400 when no category is given", async () => {
       const { category, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -623,7 +623,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
     });
 
-    it("should respond with an error when no quantity is given", async () => {
+    it("should respond with a 400 when no quantity is given", async () => {
       const { quantity, ...rest } = LAPTOP_PRODUCT;
       req.fields = rest;
 
@@ -637,7 +637,7 @@ describe("Product Controller", () => {
   });
 
   describe("productFiltersController", () => {
-    it("should respond with a success when product filter by category and range is successful", async () => {
+    it("should respond with a 200 when product filter by category and range is successful", async () => {
       req.body = {
         checked: "66db427fdb0119d9234b27ed",
         radio: [100, 200]
@@ -659,7 +659,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a success when product filter by category is successful", async () => {
+    it("should respond with a 200 when product filter by category is successful", async () => {
       req.body = {
         checked: "66db427fdb0119d9234b27ed",
         radio: []
@@ -680,7 +680,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a success when product filter by range is successful", async () => {
+    it("should respond with a 200 when product filter by range is successful", async () => {
       req.body = {
         checked: "",
         radio: [100, 200]
@@ -701,7 +701,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when product filter is unsuccessful", async () => {
+    it("should respond with a 500 when product filter is unsuccessful", async () => {
       req.body = {
         checked: "66db427fdb0119d9234b27ed",
         radio: [100, 200]
@@ -721,7 +721,7 @@ describe("Product Controller", () => {
   });
 
   describe("productCountController", () => {
-    it("should respond with a success when product count is successful", async () => {
+    it("should respond with a 200 when product count is successful", async () => {
       productModel.find = jest.fn().mockReturnThis();
       productModel.estimatedDocumentCount = jest.fn().mockResolvedValueOnce(10);
 
@@ -735,7 +735,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when product count is unsuccessful", async () => {
+    it("should respond with a 500 when product count is unsuccessful", async () => {
       productModel.find = jest.fn().mockReturnThis();
       productModel.estimatedDocumentCount = jest.fn().mockRejectedValueOnce("Database Error");
 
@@ -752,7 +752,7 @@ describe("Product Controller", () => {
 
   describe("productListController", () => {
     const perPage = 6;
-    it("should respond with a success when getting first page of products", async () => {
+    it("should respond with a 200 when getting first page of products", async () => {
       req.params.page = 1;
 
       const PRODUCTS = [
@@ -775,7 +775,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a success when getting second page of products", async () => {
+    it("should respond with a 200 when getting second page of products", async () => {
       req.params.page = 2;
 
       const PRODUCTS = [
@@ -798,7 +798,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with an error when product list is unsuccessful", async () => {
+    it("should respond with a 500 when product list is unsuccessful", async () => {
       req.params.page = 1;
       productModel.find   = jest.fn().mockReturnThis();
       productModel.select = jest.fn().mockReturnThis();
@@ -816,7 +816,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a success even when no page is specified", async () => {
+    it("should respond with a 200 even when no page is specified", async () => {
       const PRODUCTS = [
         LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT
       ];
@@ -839,7 +839,7 @@ describe("Product Controller", () => {
   });
 
   describe("searchProductController", () => {
-    it("should respond with a success if some products match keyword", async () => {
+    it("should respond with a 200 when some products match keyword", async () => {
       const mock_keyword = "mock";
       req.params.keyword = mock_keyword;
 
@@ -854,7 +854,7 @@ describe("Product Controller", () => {
       expect(res.json).toHaveBeenCalledWith(matching_products);
     });
 
-    it("should respond with a success if no products match keyword", async () => {
+    it("should respond with a 204 when no products match keyword", async () => {
       const mock_keyword = "mock";
       req.params.keyword = mock_keyword;
 
@@ -869,7 +869,7 @@ describe("Product Controller", () => {
       expect(res.json).toHaveBeenCalledWith(empty_products);
     });
 
-    it("should respond with an error if search is unsuccessful", async () => {
+    it("should respond with a 500 when search is unsuccessful", async () => {
       const mock_keyword = "mock";
       req.params.keyword = mock_keyword;
       
@@ -888,7 +888,7 @@ describe("Product Controller", () => {
   });
 
   describe("relatedProductController", () => {
-    it("should respond with a 200 if there are related products", async () => {
+    it("should respond with a 200 when there are related products", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       const mock_cid = LAPTOP_PRODUCT.category;
       req.params.pid = mock_pid;
@@ -915,7 +915,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 204 if there are no related products", async () => {
+    it("should respond with a 204 when there are no related products", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       const mock_cid = LAPTOP_PRODUCT.category;
       req.params.pid = mock_pid;
@@ -938,7 +938,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 500 if there is a database error", async () => {
+    it("should respond with a 500 when there is a database error", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       const mock_cid = LAPTOP_PRODUCT.category;
       req.params.pid = mock_pid;
@@ -961,7 +961,7 @@ describe("Product Controller", () => {
   });
 
   describe("productCategoryController", () => {
-    it("should respond with a 200 if there are products for the category", async () => {
+    it("should respond with a 200 when there are products for the category", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -988,7 +988,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 204 if there are no products for the category", async () => {
+    it("should respond with a 204 when there are no products for the category", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -1013,7 +1013,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 400 if there no category is found", async () => {
+    it("should respond with a 400 when no category is found", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -1028,7 +1028,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 500 if there is a database error for the first query", async () => {
+    it("should respond with a 500 when there is a database error for the first query", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -1044,7 +1044,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 500 if there is a database error for the second query", async () => {
+    it("should respond with a 500 when there is a database error for the second query", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
       
@@ -1081,7 +1081,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith(mockClientToken);
     });
 
-    it("should respond with a 500 if generating token produces an error", async () => {
+    it("should respond with a 500 when generating a token produces an error", async () => {
       const mockError = "error-generating-token";
       gateway.clientToken.generate = jest.fn().mockImplementation((_, callbackFn) => {
         callbackFn(mockError, null);
@@ -1095,7 +1095,7 @@ describe("Product Controller", () => {
   });
 
   describe("brainTreePaymentController", () => {
-    it("should respond with a 200 if payment was successful", async () => {
+    it("should respond with a 200 when payment is successful", async () => {
       const mockCart = [
         { name: "laptop", price: 20 },
         { name: "smartphone", price: 80.50 },
@@ -1125,7 +1125,7 @@ describe("Product Controller", () => {
       expect(res.json).toHaveBeenCalledWith({ ok: true });
     });
 
-    it("should respond with a 500 if payment was unsuccessful", async () => {
+    it("should respond with a 500 when payment is unsuccessful", async () => {
       const mockCart = [
         { name: "laptop", price: 20 },
         { name: "smartphone", price: 80.50 },
@@ -1147,7 +1147,7 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith(mockError);
     });
 
-    it("should respond with a 500 if there is a database error", async () => {
+    it("should respond with a 500 when there is a database error", async () => {
       const mockCart = [
         { name: "laptop", price: 20 },
         { name: "smartphone", price: 80.50 },
