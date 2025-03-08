@@ -384,25 +384,50 @@ describe("Product Controller", () => {
 
   describe("updateProductController", () => {
     it("should respond with a success when product update is successful", async () => {
-      req.fields = BOOK_PRODUCT;
-      const mock_pid = BOOK_PRODUCT._id;
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
+      req.files = { photo: VALID_LAPTOP_PHOTO };
 
-      const bookModel = new productModel(BOOK_PRODUCT);
-      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(bookModel);
+      const laptopModel = new productModel(UPDATED_LAPTOP_PRODUCT);
+      // Return a productModel instance to ensure that save() can be called
+      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(laptopModel);
       productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      const mockImageData = Buffer.from("mockimagedata");
+      jest.spyOn(fs, "readFileSync").mockReturnValue(mockImageData);
 
       await updateProductController(req, res);
 
-      // expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
-      //   mock_pid,
-      //   { ...req.fields, ??? }
-      //   { new: true }
-      // );
+      expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        mock_pid,
+        { ...req.fields, slug: expect.any(String) },
+        { new: true }
+      );
       expect(res.status).toHaveBeenCalledWith(201);
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBeTruthy(); 
-      expect(responseData.products).toMatchObject(bookModel);
+      const receivedProduct = responseData.products;
+      expect(receivedProduct).toMatchObject({
+        ...UPDATED_LAPTOP_PRODUCT,
+        _id: expect.any(mongoose.Types.ObjectId),
+        category: expect.any(mongoose.Types.ObjectId)
+      });
+      expect(receivedProduct.photo.contentType).toBe(VALID_LAPTOP_PHOTO.type);
+      expect(receivedProduct.photo.data.equals(mockImageData)).toBe(true);
+      expect(receivedProduct.category.toString()).toBe(UPDATED_LAPTOP_PRODUCT.category);
+    });
+
+    it("should respond with an error when photo size exceeds 1mb", async () => {
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
+      req.files = { photo: INVALID_SIZE_LAPTOP_PHOTO };
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({ error: "photo should be less then 1mb" });
     });
 
     it("should respond with a success when product update is unsuccessful", async () => {
