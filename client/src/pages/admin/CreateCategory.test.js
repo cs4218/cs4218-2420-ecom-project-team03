@@ -96,6 +96,25 @@ describe("CreateCategory Component", () => {
     });
   });
 
+  it("handles API response with success:false in getAllCategory", async () => {
+    axios.get.mockResolvedValue({
+      data: {
+        success: false,
+        message: "Error while fetching categories",
+      },
+    });
+  
+    render(
+      <MemoryRouter>
+        <CreateCategory />
+      </MemoryRouter>
+    );
+  
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Error while fetching categories");
+    });
+  });
+
   it("handles creating a new category using an existing category name", async () => {
     // Return a valid response object, but with success false
     axios.post.mockResolvedValue({
@@ -264,7 +283,7 @@ describe("CreateCategory Component", () => {
 
   it("deletes a category successfully", async () => {
     axios.delete.mockResolvedValue({
-      data: { success: true, message: "category is deleted" },
+      data: { success: true, message: "Category is deleted" },
     });
 
     render(
@@ -278,7 +297,7 @@ describe("CreateCategory Component", () => {
 
     await waitFor(() => {
       expect(axios.delete).toHaveBeenCalledWith("/api/v1/category/delete-category/1");
-      expect(toast.success).toHaveBeenCalledWith("category is deleted");
+      expect(toast.success).toHaveBeenCalledWith("Category is deleted");
     });
   });
 
