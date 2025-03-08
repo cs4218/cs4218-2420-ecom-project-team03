@@ -36,6 +36,8 @@ const CreateCategory = () => {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data.success) {
         setCategories(data.category);
+      } else {
+        toast.error(data.message);
       }
     } catch (error) {
       console.log(error);
@@ -75,7 +77,7 @@ const CreateCategory = () => {
         `/api/v1/category/delete-category/${pId}`
       );
       if (data.success) {
-        toast.success(`category is deleted`);
+        toast.success(`Category is deleted`);
 
         getAllCategory();
       } else {
