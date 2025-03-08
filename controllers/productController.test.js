@@ -128,6 +128,26 @@ describe("Product Controller", () => {
       expect(receivedProduct.category.toString()).toBe(LAPTOP_PRODUCT.category);
     });
 
+    it("should respond with a success when product is created with no photo", async () => {
+      req.fields = LAPTOP_PRODUCT;
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await createProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      const responseData = res.send.mock.calls[0][0];
+      expect(responseData.success).toBeTruthy(); 
+      const receivedProduct = responseData.products;
+      // Partial match to ignore value of slug
+      expect(receivedProduct).toMatchObject({
+        ...LAPTOP_PRODUCT,
+        _id: expect.any(mongoose.Types.ObjectId),
+        category: expect.any(mongoose.Types.ObjectId),
+      });
+      expect(receivedProduct.category.toString()).toBe(LAPTOP_PRODUCT.category);
+    });
+
     it("should respond with an error when product photo is greater than 1mb", async () => {
       req.fields = LAPTOP_PRODUCT;
       req.files = { photo: INVALID_SIZE_LAPTOP_PHOTO };
