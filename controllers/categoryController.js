@@ -19,7 +19,7 @@ export const createCategoryController = async (req, res) => {
     }).save();
     res.status(201).send({
       success: true,
-      message: "new category created",
+      message: "New Category Created",
       category,
     });
   } catch (error) {
@@ -97,7 +97,7 @@ export const singleCategoryController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error While getting Single Category",
+      message: "Error While Getting Single Category",
     });
   }
 };
