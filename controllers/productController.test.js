@@ -739,6 +739,27 @@ describe("Product Controller", () => {
         error: "Database Error",
       });
     });
+
+    it("should respond with a success even when no page is specified", async () => {
+      const PRODUCTS = [
+        LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT, LAPTOP_PRODUCT
+      ];
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockReturnThis();
+      productModel.skip   = jest.fn().mockReturnThis();
+      productModel.limit  = jest.fn().mockReturnThis();
+      productModel.sort   = jest.fn().mockResolvedValueOnce(PRODUCTS);
+
+      await productListController(req, res);
+
+      expect(productModel.skip).toHaveBeenCalledWith(0);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Product list for page 1 successful",
+        products: PRODUCTS,
+      });
+    });
   });
 
   describe("searchProductController", () => {

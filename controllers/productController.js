@@ -85,6 +85,7 @@ export const getProductController = async (req, res) => {
     });
   }
 };
+
 // get single product
 export const getSingleProductController = async (req, res) => {
   try {
@@ -333,6 +334,7 @@ export const productCategoryController = async (req, res) => {
         success: false,
         message: "Invalid category"
       });
+      return;
     }
 
     const products = await productModel.find({ category }).populate("category");
