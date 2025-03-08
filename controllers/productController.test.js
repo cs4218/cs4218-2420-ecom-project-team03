@@ -1,4 +1,5 @@
 import { expect, jest } from "@jest/globals";
+import braintree from "braintree";
 import { 
   createProductController, 
   getProductController, 
@@ -11,7 +12,9 @@ import {
   updateProductController,
   searchProductController,
   relatedProductController,
-  productCategoryController
+  productCategoryController,
+  braintreeTokenController,
+  gateway
 } from "./productController";
 import productModel from "../models/productModel";
 import categoryModel from "../models/categoryModel";
@@ -916,6 +919,32 @@ describe("Product Controller", () => {
         error: "Database Error",
         message: "Error while getting products",
       });
+    });
+  });
+
+  describe("braintreeTokenController", () => {
+    it("should respond with a 200 with the client token", async () => {
+      const mockClientToken = { clientToken: "mock-client-token", success: true };
+      gateway.clientToken.generate = jest.fn().mockImplementation((_, callbackFn) => {
+        callbackFn(null, mockClientToken);
+      });
+
+      await braintreeTokenController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith(mockClientToken);
+    });
+
+    it("should respond with a 500 if generating token produces an error", async () => {
+      const mockError = "error-generating-token";
+      gateway.clientToken.generate = jest.fn().mockImplementation((_, callbackFn) => {
+        callbackFn(mockError, null);
+      });
+
+      await braintreeTokenController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(mockError);
     });
   });
 });
