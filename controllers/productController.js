@@ -111,10 +111,28 @@ export const getSingleProductController = async (req, res) => {
 // get photo
 export const productPhotoController = async (req, res) => {
   try {
-    const product = await productModel.findById(req.params.pid).select("photo");
-    if (product.photo.data) {
-      res.set("Content-type", product.photo.contentType);
-      return res.status(200).send(product.photo.data);
+    const product = await productModel.findById(req.params.pid)
+    if (!product) {
+      return res.status(400).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    }
+    
+    const productPhoto = await product.select("photo");
+    if (productPhoto && productPhoto.data) {
+      res.set("Content-type", productPhoto.contentType);
+      return res.status(200).send({
+        success: true,
+        data: productPhoto.data,
+        message: "Photo Fetched Successfully"
+      });
+    } else {
+      return res.status(204).send({
+        success: true,
+        message: "No Photo Found"
+      });
     }
   } catch (error) {
     console.log(error);
