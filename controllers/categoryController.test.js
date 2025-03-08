@@ -155,7 +155,7 @@ describe("Category Controller", () => {
 
       categoryModel.findOne = jest.fn().mockResolvedValue(null);
       categoryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(mockError);
-      
+
       await updateCategoryController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
@@ -208,6 +208,20 @@ describe("Category Controller", () => {
         success: true,
         message: "Get Single Category Successfully",
         category: categories[0],
+      });
+    });
+
+    it("should return 404 if category is not found", async () => {
+      req = { params: { slug: "nonexistent-slug" } };
+      categoryModel.findOne = jest.fn().mockResolvedValue(null);
+    
+      await singleCategoryController(req, res);
+    
+      expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "nonexistent-slug" });
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Category not found",
       });
     });
 
