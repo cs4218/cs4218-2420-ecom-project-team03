@@ -50,12 +50,12 @@ describe("Category Controller", () => {
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        message: "new category created",
+        message: "New Category Created",
         category: { name: "new", slug: slugify("new") },
       });
     });
 
-    it("should create return status 200 if category already exists", async () => {
+    it("should not create a new category if the category name already exists", async () => {
       req.body = { name: "already exists" };
 
       categoryModel.findOne = jest
@@ -68,7 +68,7 @@ describe("Category Controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
-        success: true,
+        success: false,
         message: "Category Already Exists",
       });
     });
@@ -100,7 +100,7 @@ describe("Category Controller", () => {
     it("should successfully update a category", async () => {
       req.body.name = "updated";
       req.params.id = "1";
-
+      categoryModel.findOne = jest.fn().mockResolvedValue(null);
       categoryModel.findByIdAndUpdate = jest.fn().mockResolvedValue({
         name: "updated",
         slug: slugify("updated"),
@@ -116,13 +116,46 @@ describe("Category Controller", () => {
       });
     });
 
+    it("should not update a category if new name already exists", async () => {
+      req.body.name = "existing category";
+      req.params.id = "1";
+
+      categoryModel.findOne = jest
+        .fn()
+        .mockResolvedValue({ _id: "99", name: "existing category" });
+
+      await updateCategoryController(req, res);
+
+      expect(categoryModel.findOne).toHaveBeenCalledWith({
+        name: "existing category",
+      });
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Category Already Exists",
+      });
+    });
+
+    it("should not update a category if new name is an empty string", async () => {
+      req.body.name = "";
+
+      await updateCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.send).toHaveBeenCalledWith({
+        message: "Name is required",
+      });
+    });
+
     it("should handle any errors and return status 500", async () => {
       req.body.name = "updated";
       req.params.id = "1";
       let mockError = new Error("some error");
 
+      categoryModel.findOne = jest.fn().mockResolvedValue(null);
       categoryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(mockError);
-
+      
       await updateCategoryController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
@@ -189,7 +222,7 @@ describe("Category Controller", () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Error While getting Single Category",
+        message: "Error While Getting Single Category",
         error: mockError,
       });
     });
