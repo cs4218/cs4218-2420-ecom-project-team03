@@ -15,10 +15,12 @@ import {
 } from "./productController";
 import productModel from "../models/productModel";
 import categoryModel from "../models/categoryModel";
+import fs from "fs";
+import mongoose from "mongoose";
 
 jest.mock("../models/productModel.js");
 jest.mock("../models/categoryModel.js");
-// jest.mock("slugify");
+jest.mock("fs");
 
 const LAPTOP_PRODUCT = {
   _id: "66db427fdb0119d9234b27f3",
@@ -28,6 +30,28 @@ const LAPTOP_PRODUCT = {
   category: "66db427fdb0119d9234b27ed", 
   quantity: 30,
   shipping: true,
+};
+
+const UPDATED_LAPTOP_PRODUCT = {
+  _id: "66db427fdb0119d9234b27f3",
+  name: "Laptop 2",
+  description: "A not so powerful laptop",
+  price: 90, 
+  category: "66db427fdb0119d9234b27ed", 
+  quantity: 2,
+  shipping: false,
+};
+
+const VALID_LAPTOP_PHOTO = {
+  path: "example-path",
+  type: "image/jpeg",
+  size: 100
+};
+
+const INVALID_SIZE_LAPTOP_PHOTO = {
+  path: "example-path",
+  type: "image/jpeg",
+  size: 1000001
 };
 
 const SMARTPHONE_PRODUCT = {
@@ -73,23 +97,12 @@ describe("Product Controller", () => {
   })
 
   describe("createProductController", () => {
-    const LAPTOP_PHOTO = {
-      path: "example-path",
-      type: "image/jpeg",
-      size: 1000
-    };
-
-    const EXPECTED_LAPTOP_WITHOUT_PHOTO = {
-      name: "Laptop",
-      description: "A powerful laptop",
-      price: 1499.99, 
-      category: "66db427fdb0119d9234b27ed", 
-      quantity: 30,
-      shipping: true
-    };
-
     it("should respond with a success when product creation is successful", async () => {
       req.fields = LAPTOP_PRODUCT;
+      req.files = { photo: VALID_LAPTOP_PHOTO };
+
+      const mockImageData = Buffer.from("mockimagedata");
+      jest.spyOn(fs, "readFileSync").mockReturnValue(mockImageData);
 
       productModel.prototype.save = jest.fn().mockResolvedValueOnce();
 
@@ -98,11 +111,49 @@ describe("Product Controller", () => {
       expect(res.status).toHaveBeenCalledWith(201);
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBeTruthy(); 
-      expect(responseData.products).toMatchObject({ 
-        ...EXPECTED_LAPTOP_WITHOUT_PHOTO,
-        category: expect.any(Object)
+      const receivedProduct = responseData.products;
+      // Partial match to ignore value of slug
+      expect(receivedProduct).toMatchObject({
+        ...LAPTOP_PRODUCT,
+        _id: expect.any(mongoose.Types.ObjectId),
+        category: expect.any(mongoose.Types.ObjectId),
       });
-      expect(responseData.products.category.toString()).toBe(LAPTOP_PRODUCT.category);
+      expect(receivedProduct.photo.contentType).toBe(VALID_LAPTOP_PHOTO.type);
+      expect(receivedProduct.photo.data.equals(mockImageData)).toBe(true);
+      expect(receivedProduct.category.toString()).toBe(LAPTOP_PRODUCT.category);
+    });
+
+    it("should respond with an error when product photo is greater than 1mb", async () => {
+      req.fields = LAPTOP_PRODUCT;
+      req.files = { photo: INVALID_SIZE_LAPTOP_PHOTO };
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await createProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        error: "photo should be less then 1mb",
+      });
+    });
+
+    it("should respond with an error when there is a database error", async () => {
+      req.fields = LAPTOP_PRODUCT;
+      req.files = { photo: VALID_LAPTOP_PHOTO };
+
+      const mockImageData = Buffer.from("mockimagedata");
+      jest.spyOn(fs, "readFileSync").mockReturnValue(mockImageData);
+
+      productModel.prototype.save = jest.fn().mockRejectedValueOnce("Database Error");
+
+      await createProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        error: "Database Error",
+        message: "Error in creating product",
+      });
     });
 
     it("should respond with an error when no name is given", async () => {
