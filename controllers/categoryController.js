@@ -37,6 +37,13 @@ export const updateCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
     const { id } = req.params;
+    const existingCategory = await categoryModel.findOne({ name });
+    if (existingCategory) {
+      return res.status(200).send({
+        success: false,
+        message: "Category Already Exists",
+      });
+    }
     const category = await categoryModel.findByIdAndUpdate(
       id,
       { name, slug: slugify(name) },
