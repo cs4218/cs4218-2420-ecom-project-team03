@@ -31,9 +31,9 @@ describe("Categories component", () => {
         <Categories />
       </MemoryRouter>
     );
+    expect(screen.getByText("All Categories")).toBeInTheDocument();
 
     const categoriesList = screen.getByTestId("categories-list");
-
     const firstCategory = within(categoriesList).getByText("first-category");
     expect(firstCategory).toBeInTheDocument();
     expect(firstCategory.closest("a")).toHaveAttribute("href", "/category/first-category");
@@ -54,6 +54,9 @@ describe("Categories component", () => {
 
     const categoriesList = screen.getByTestId("categories-list");
 
+    // Only "All categories" should appear
+    expect(screen.getByText("All Categories")).toBeInTheDocument();
+    // links other than "all categories" will not exist
     expect(within(categoriesList).queryByRole("link")).toBeNull();
   });
 });
