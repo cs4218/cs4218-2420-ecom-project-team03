@@ -156,7 +156,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
         error: "photo should be less then 1mb",
       });
@@ -189,7 +189,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
     });
 
@@ -201,7 +201,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
     });
 
@@ -213,7 +213,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
     });
 
@@ -225,7 +225,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
     });
 
@@ -237,7 +237,7 @@ describe("Product Controller", () => {
 
       await createProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
     });
   });
@@ -536,7 +536,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "photo should be less then 1mb" });
     });
 
@@ -583,7 +583,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
     });
 
@@ -595,7 +595,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
     });
 
@@ -607,7 +607,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
     });
 
@@ -619,7 +619,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
     });
 
@@ -631,7 +631,7 @@ describe("Product Controller", () => {
 
       await updateProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
     });
   });
