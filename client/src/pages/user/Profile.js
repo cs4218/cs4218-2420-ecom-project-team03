@@ -46,7 +46,7 @@ const Profile = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error("Something went wrong while updating the profile");
     }
   };
   return (
@@ -57,7 +57,7 @@ const Profile = () => {
             <UserMenu />
           </div>
           <div className="col-md-9">
-            <div className="form-container ">
+            <div className="form-container">
               <form onSubmit={handleSubmit}>
                 <h4 className="title">USER PROFILE</h4>
                 <div className="mb-3">
@@ -78,7 +78,7 @@ const Profile = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="form-control"
                     id="exampleInputEmail1"
-                    placeholder="Enter Your Email "
+                    placeholder="Enter Your Email"
                     disabled
                   />
                 </div>
@@ -98,7 +98,7 @@ const Profile = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
+                    id="exampleInputPhone1"
                     placeholder="Enter Your Phone"
                   />
                 </div>
@@ -108,7 +108,7 @@ const Profile = () => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
+                    id="exampleInputAddress1"
                     placeholder="Enter Your Address"
                   />
                 </div>
