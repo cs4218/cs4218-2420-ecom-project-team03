@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for components/Spinner.js</title>
+    <title>Code coverage report for context/auth.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">components</a> Spinner.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">context</a> auth.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,28 +94,30 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -123,40 +125,53 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-const Spinner = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> path = <span class="branch-0 cbranch-no" title="branch not covered" >"login" </span>}) =&gt; {</span>
-  const [count, setCount] = <span class="cstat-no" title="statement not covered" >useState(3);</span>
-  const navigate = <span class="cstat-no" title="statement not covered" >useNavigate();</span>
-  const location = <span class="cstat-no" title="statement not covered" >useLocation();</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useState, useContext, createContext, useEffect } from "react";
+import axios from "axios";
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-    const interval = <span class="cstat-no" title="statement not covered" >setInterval(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      setCount(<span class="fstat-no" title="function not covered" >(p</span>revValue) =&gt; <span class="cstat-no" title="statement not covered" >--prevValue)</span>;</span>
-    }, 1000);
-<span class="cstat-no" title="statement not covered" >    count === 0 &amp;&amp; navigate(`/${path}`, {</span>
-        state: location.pathname,
-      });
-<span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >clearInterval(interval);</span></span>
-  }, [count, navigate, location]);
-<span class="cstat-no" title="statement not covered" >  return (</span>
-    &lt;&gt;
-      &lt;div
-        className="d-flex flex-column justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      &gt;
-        &lt;h1 className="Text-center"&gt;redirecting to you in {count} second &lt;/h1&gt;
-        &lt;div className="spinner-border" role="status"&gt;
-          &lt;span className="visually-hidden"&gt;Loading...&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/&gt;
-  );
+const AuthContext = createContext();
+&nbsp;
+const AuthProvider = ({ children }) =&gt; {
+    const [auth, setAuth] = useState({
+        user: null,
+        token: "",
+    });
+&nbsp;
+    //default axios
+    axios.defaults.headers.common["Authorization"] = auth?.token;
+&nbsp;
+    useEffect(() =&gt; {
+       const data = localStorage.getItem("auth");
+       if (data) {
+        const parseData = JSON.parse(data);
+        setAuth({
+            ...auth,
+            user: parseData.user,
+            token: parseData.token,
+        });
+       }
+       //eslint-disable-next-line
+    }, []);
+    return (
+        &lt;AuthContext.Provider value={[auth, setAuth]}&gt;
+            {children}
+        &lt;/AuthContext.Provider&gt;
+    );
 };
 &nbsp;
-export default Spinner;</pre></td></tr></table></pre>
+// custom hook
+const useAuth = () =&gt; useContext(AuthContext);
+&nbsp;
+export {useAuth, AuthProvider};</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
