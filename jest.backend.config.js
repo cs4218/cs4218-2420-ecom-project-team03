@@ -1,3 +1,5 @@
+import { transform } from "@babel/core";
+
 export default {
   // display name
   displayName: "backend",
@@ -10,14 +12,13 @@ export default {
   // which test to run
   testMatch: [
     "<rootDir>/controllers/*.test.js",
-    "<rootDir>/helpers/*.test.js"
+    "<rootDir>/helpers/*.test.js",
+    "<rootDir>/middlewares/*.test.js"
   ],
-
-  transform: {},
 
   // jest code coverage
   collectCoverage: true,
-  collectCoverageFrom: ["controllers/**", "helpers/**"],
+  collectCoverageFrom: ["controllers/**", "helpers/**",  "middlewares/**"],
   coverageThreshold: {
     global: {
       lines: 100,
