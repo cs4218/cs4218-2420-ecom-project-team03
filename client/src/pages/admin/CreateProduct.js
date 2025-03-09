@@ -24,10 +24,12 @@ const CreateProduct = () => {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
         setCategories(data?.category);
+      } else {
+        toast.error("Something went wrong in getting category");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error("Something went wrong in getting category");
     }
   };
 
@@ -46,19 +48,25 @@ const CreateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.post(
+      productData.append("shipping", shipping);
+      const { data } = await axios.post(
         "/api/v1/product/create-product",
         productData
       );
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Created Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error("Something went wrong in creating product");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("something went wrong");
+      if (error.response?.status === 500) {
+        toast.error("Something went wrong in creating product");
+      } else if (error.response?.status === 400) {
+        toast.error("Invalid details provided");
+      } else {
+        toast.error("Something went wrong in creating product");
+      }
     }
   };
 
@@ -70,14 +78,16 @@ const CreateProduct = () => {
             <AdminMenu />
           </div>
           <div className="col-md-9">
-            <h1>Create Product</h1>
+            <h1 data-testid="create-product-header">Create Product</h1>
             <div className="m-1 w-75">
               <Select
-                bordered={false}
+                data-testid="category-select"
+                variant="outlined"
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                className="form-select mb-3"
+                style={{ width: '100%' }}
+                className="mb-3"
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -92,6 +102,7 @@ const CreateProduct = () => {
                 <label className="btn btn-outline-secondary col-md-12">
                   {photo ? photo.name : "Upload Photo"}
                   <input
+                    data-testid="file-upload"
                     type="file"
                     name="photo"
                     accept="image/*"
@@ -116,7 +127,7 @@ const CreateProduct = () => {
                 <input
                   type="text"
                   value={name}
-                  placeholder="write a name"
+                  placeholder="Write a name"
                   className="form-control"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -125,7 +136,7 @@ const CreateProduct = () => {
                 <textarea
                   type="text"
                   value={description}
-                  placeholder="write a description"
+                  placeholder="Write a description"
                   className="form-control"
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -135,7 +146,7 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={price}
-                  placeholder="write a Price"
+                  placeholder="Write a price"
                   className="form-control"
                   onChange={(e) => setPrice(e.target.value)}
                 />
@@ -144,18 +155,20 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={quantity}
-                  placeholder="write a quantity"
+                  placeholder="Write a quantity"
                   className="form-control"
                   onChange={(e) => setQuantity(e.target.value)}
                 />
               </div>
               <div className="mb-3">
                 <Select
-                  bordered={false}
-                  placeholder="Select Shipping "
+                  data-testid="shipping-select"
+                  variant="outlined"
+                  placeholder="Select shipping"
                   size="large"
                   showSearch
-                  className="form-select mb-3"
+                  style={{ width: '100%' }}
+                  className="mb-3"
                   onChange={(value) => {
                     setShipping(value);
                   }}
