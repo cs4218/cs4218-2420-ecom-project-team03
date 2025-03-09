@@ -40,7 +40,6 @@ export default {
     "client/src/pages/**",
     "client/src/components/Form/**"
   ],
-
   coverageThreshold: {
     global: {
       lines: 100,
