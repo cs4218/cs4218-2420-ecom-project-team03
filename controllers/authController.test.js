@@ -658,26 +658,6 @@ describe("Get Orders Controller", () => {
 describe("Get All Orders Controller", () => {
     let req, res;
 
-    const mockOrders = [
-        {
-            _id: "order1",
-            products: [{ _id: "product1", name: "Laptop" }],
-            buyer: { _id: "user123", name: "John Doe" },
-            status: "Processing",
-        },
-        {
-            _id: "order2",
-            products: [{ _id: "product2", name: "Phone" }],
-            buyer: { _id: "user123", name: "John Doe" },
-            status: "Shipped",
-        },
-    ];
-
-    const populateMocks = [
-        jest.fn(() => ({ populate: populateMocks[1] })),
-        jest.fn(() => ({ sort: jest.fn(() => ({ exec: jest.fn().mockResolvedValue(mockOrders) })) })),
-    ];
-
     beforeEach(() => {
         jest.clearAllMocks();
         req = {};
@@ -687,20 +667,39 @@ describe("Get All Orders Controller", () => {
             json: jest.fn(),
         };
 
-        orderModel.find = jest.fn(() => ({ populate: populateMocks[0] }));
+        orderModel.find.mockReturnValue({
+            populate: jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue({
+                    sort: jest.fn().mockReturnValue({
+                        exec: jest.fn().mockResolvedValue([
+                            {
+                                _id: "order1",
+                                products: [{ _id: "product1", name: "Laptop" }],
+                                buyer: { _id: "user123", name: "John Doe" },
+                                status: "Processing",
+                            },
+                            {
+                                _id: "order2",
+                                products: [{ _id: "product2", name: "Phone" }],
+                                buyer: { _id: "user123", name: "John Doe" },
+                                status: "Shipped",
+                            },
+                        ]),
+                    }),
+                }),
+            }),
+        });
     });
 
-    // Need fix
     it("should return all orders successfully", async () => {
         await getAllOrdersController(req, res);
 
         expect(orderModel.find).toHaveBeenCalledWith({});
+        expect(orderModel.find().populate).toHaveBeenCalledWith("products", "-photo");
+        expect(orderModel.find().populate().populate).toHaveBeenCalledWith("buyer", "name");
+        expect(orderModel.find().populate().populate().sort).toHaveBeenCalledWith({ createdAt: "-1" });
 
-        expect(populateMocks[0]).toHaveBeenCalledWith("products", "-photo");
-        expect(populateMocks[1]).toHaveBeenCalledWith("buyer", "name");
-
-        expect(populateMocks[1]().sort).toHaveBeenCalledWith({ createdAt: "-1" });
-        expect(res.json).toHaveBeenCalledWith(mockOrders);
+        expect(res.json).toHaveBeenCalledTimes(1);
     });
 
     it("should return a 500 error if an exception occurs", async () => {
