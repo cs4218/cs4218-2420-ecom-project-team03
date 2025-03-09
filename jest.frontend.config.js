@@ -41,7 +41,6 @@ export default {
     "client/src/pages/**",
     "client/src/components/Form/**",
     "client/src/context/**"
-=======
     "client/src/components/Form/**"
   ],
   coverageThreshold: {
