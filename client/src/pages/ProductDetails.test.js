@@ -3,7 +3,9 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
+import toast from "react-hot-toast";
 import ProductDetails from './ProductDetails';
+import Pagenotfound from './Pagenotfound';
 
 const LAPTOP = {
   _id: '1',
@@ -45,13 +47,14 @@ const TELEVISION = {
 }
 
 jest.mock('axios');
+jest.mock("react-hot-toast");
 
 jest.mock('../context/auth', () => ({
   useAuth: jest.fn(() => [null, jest.fn()])
 }));
 
 jest.mock('../context/cart', () => ({
-  useCart: jest.fn(() => [null, jest.fn()])
+  useCart: jest.fn(() => [[], jest.fn()])
 }));
   
 jest.mock('../context/search', () => ({
@@ -59,6 +62,25 @@ jest.mock('../context/search', () => ({
 })); 
 
 jest.mock("../hooks/useCategory", () => jest.fn(() => []));
+
+Object.defineProperty(window, "localStorage", {
+  value: {
+    setItem: jest.fn(),
+    getItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  writable: true,
+});
+
+window.matchMedia =
+  window.matchMedia ||
+  function () {
+    return {
+      matches: false,
+      addListener: function () {},
+      removeListener: function () {},
+    };
+  };
 
 describe('Product Details Component', () => {
   beforeEach(() => {
@@ -97,6 +119,50 @@ describe('Product Details Component', () => {
     expect(getByText('ADD TO CART')).toBeInTheDocument();
   });
 
+  it('should navigate to 404 is slug has no product associated with it', async () => {
+    axios.get.mockResolvedValueOnce({
+      data: {
+        product: null,
+      }
+    });
+
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/product/laptop']}>
+        <Routes>
+          <Route path="/product/:slug" element={<ProductDetails />} />
+          <Route path="*" element={<Pagenotfound />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    await waitFor(() => expect(getByText("404")).toBeInTheDocument());
+  });
+
+  it('should add product to cart', async () => {
+    axios.get.mockResolvedValueOnce({
+      data: {
+        product: LAPTOP,
+      }
+    }).mockResolvedValueOnce({ data: { products: [ ] } });
+
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/product/laptop']}>
+        <Routes>
+            <Route path="/product/:slug" element={<ProductDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
+
+    expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("primary-add-to-cart"));
+    expect(localStorage.setItem).toHaveBeenCalledWith("cart",JSON.stringify([LAPTOP]));
+    expect(toast.success).toHaveBeenCalledWith("Item Added to cart");
+  });
+
   it('should generate product image with correct attributes', async () => {
     axios.get.mockResolvedValueOnce({
       data: {
@@ -114,10 +180,12 @@ describe('Product Details Component', () => {
 
     await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
 
-    const imgElement = screen.getByRole("img");
-    expect(imgElement).toBeInTheDocument();
-    expect(imgElement).toHaveAttribute("src", "/api/v1/product/product-photo/1");
-    expect(imgElement).toHaveAttribute("alt", "Laptop");
+    await waitFor(() => {
+      const imgElement = screen.getByRole("img");
+      expect(imgElement).toBeInTheDocument();
+      expect(imgElement).toHaveAttribute("src", "/api/v1/product/product-photo/1");
+      expect(imgElement).toHaveAttribute("alt", "Laptop");
+    });
   });
 
   it('should render no similar products', async () => {
@@ -221,6 +289,31 @@ describe('Product Details Component', () => {
     expect(await screen.findByText('Price :$999.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronics')).toBeInTheDocument();
     expect(getByText('ADD TO CART')).toBeInTheDocument();
+  });
+
+  it('should add similar product to cart', async () => {
+    axios.get.mockResolvedValueOnce({
+      data: {
+        product: LAPTOP,
+      }
+    }).mockResolvedValueOnce({ data: { products: [ SMARTPHONE ] } });
+    
+
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/product/laptop']}>
+        <Routes>
+            <Route path="/product/:slug" element={<ProductDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
+
+    expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
+
+    fireEvent.click(await screen.findByText('Add to Cart'));
+    expect(localStorage.setItem).toHaveBeenCalledWith("cart",JSON.stringify([SMARTPHONE]));
+    expect(toast.success).toHaveBeenCalledWith("Item Added to cart");
   });
 
   it('should gracefully handle error with getting product details', async () => {
