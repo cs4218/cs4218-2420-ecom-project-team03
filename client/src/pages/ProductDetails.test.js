@@ -177,7 +177,6 @@ describe('Product Details Component', () => {
           </Routes>
       </MemoryRouter>
     );
-
     await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
 
     await waitFor(() => {
