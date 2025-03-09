@@ -30,7 +30,6 @@ export default {
     "<rootDir>/client/src/pages/user/*.test.js",
     "<rootDir>/client/src/context/*.test.js",
   ],
-
   // jest code coverage
   collectCoverage: true,
   collectCoverageFrom: [
@@ -42,6 +41,8 @@ export default {
     "client/src/pages/**",
     "client/src/components/Form/**",
     "client/src/context/**"
+=======
+    "client/src/components/Form/**"
   ],
   coverageThreshold: {
     global: {
