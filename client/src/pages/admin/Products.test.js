@@ -34,36 +34,18 @@ describe("Products Component", () => {
       name: "Laptop",
       slug: "laptop",
       description: "A powerful laptop",
-      price: 1499.99,
-      category: {
-        _id: "1",
-        name: "Electronics",
-        slug: "electronics"
-      }
     },
     {
       _id: '2',
       name: "Smartphone",
       slug: "smartphone",
       description: "A high-end smartphone",
-      price: 999.99,
-      category: {
-        _id: "1",
-        name: "Electronics",
-        slug: "electronics"
-      }
     },
     {
       _id: '3',
       name: "Textbook",
       slug: "textbook",
       description: "CS4218 Textbook in mint condition.",
-      price: 400,
-      category: {
-        _id: "2",
-        name: "Book",
-        slug: "book"
-      }
     } 
   ];
 
