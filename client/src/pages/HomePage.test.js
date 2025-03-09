@@ -8,7 +8,6 @@ import HomePage from './HomePage';
 import { Prices } from '../components/Prices';
 import ProductDetails from './ProductDetails';
 import { el } from 'date-fns/locale';
-import exp from 'constants';
 
 const NUS_TSHIRT = {
     _id: 'nus t-shirt',
@@ -141,13 +140,6 @@ jest.mock('../context/search', () => ({
 jest.mock("../hooks/useCategory", () => jest.fn(() => []));
 
 describe('Home Page Component', () => {
-    beforeAll(() => {
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { reload: jest.fn() },
-          });
-    });
-
     beforeEach(() => {
         jest.clearAllMocks();
         localStorage.clear();
@@ -372,157 +364,7 @@ describe('Home Page Component', () => {
         expect(mockedSetCart).toHaveBeenCalledWith(expect.arrayContaining([NOVEL]));
         expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([NOVEL]));
         expect(await screen.findByText('Item Added to cart')).toBeInTheDocument();
-    });
-
-    it('should filter products by category and price', async () => {        
-        axios.get.mockImplementation((url) => {
-            if (url === "/api/v1/category/get-category") {
-              return Promise.resolve({
-                data: {
-                  success: true,
-                  message: "All Category List",
-                  category: [LAPTOP.category, NOVEL.category, NUS_TSHIRT.category],
-                },
-              });
-            } else if (url === "/api/v1/product/product-count") {
-              return Promise.resolve({
-                data: {
-                  success: true,
-                  total: 18,
-                },
-              });
-            } else if (url === `/api/v1/product/product-list/1`) {
-              return Promise.resolve({
-                data: {
-                  success: true,
-                  products: [LAPTOP, SMARTPHONE, NOVEL, NUS_TSHIRT, TEXTBOOK, CONTRACT],
-                },
-              });
-            }
-            return Promise.reject(new Error("not found"));
-        });
-
-        const { getByText } = render(
-            <MemoryRouter initialEntries={['/']}>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                </Routes>
-            </MemoryRouter>
-        );
-
-        await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(3));
-        const electronicsCategory = await screen.findByText('Electronics');
-        const clothingCategory = await screen.findByText('Clothing');
-        const bookCategory = await screen.findByText('Book');
-        const priceZeroToNinteen = screen.getByLabelText('$0 to 19.99');
-        const priceTwentyToThirtyNine = screen.getByLabelText('$20 to 39.99');
-        const priceFortyToFiftyNine = screen.getByLabelText('$40 to 59.99');
-        const priceSixtyToSeventyNine = screen.getByLabelText('$60 to 79.99');
-        const priceEightyToNintyNine = screen.getByLabelText('$80 to 99.99');
-        const priceHundredOrMore = screen.getByLabelText('$100 or more');
-        const resetFilter = await screen.findByText('RESET FILTERS');
-        expect(electronicsCategory).toBeInTheDocument();
-        expect(clothingCategory).toBeInTheDocument();
-        expect(bookCategory).toBeInTheDocument();
-        expect(priceZeroToNinteen).toBeInTheDocument();
-        expect(priceTwentyToThirtyNine).toBeInTheDocument();
-        expect(priceFortyToFiftyNine).toBeInTheDocument();
-        expect(priceSixtyToSeventyNine).toBeInTheDocument();
-        expect(priceEightyToNintyNine).toBeInTheDocument();
-        expect(priceHundredOrMore).toBeInTheDocument();
-        expect(resetFilter).toBeInTheDocument();
-
-        // Filter by category
-        fireEvent.click(electronicsCategory);
-        await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-            checked: ['electronics'],
-            radio: [],
-        });
-
-        fireEvent.click(clothingCategory);
-        await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(2));
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-            checked: ['electronics', 'clothing'],
-            radio: [],
-        });
-
-        fireEvent.click(bookCategory);
-        await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(3));
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-            checked: ['electronics', 'clothing', 'book'],
-            radio: [],
-        });
-
-        fireEvent.click(clothingCategory);
-        await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(4));
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-            checked: ['electronics', 'book'],
-            radio: [],
-        });
-
-        fireEvent.click(resetFilter);
-        await waitFor(() => expect(window.location.reload).toHaveBeenCalledTimes(1));
-
-        // Filter by price
-        // fireEvent.change(priceZeroToNinteen, { target: { value: priceZeroToNinteen.value } });
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: priceZeroToNinteen.value,
-        // });
-
-        // fireEvent.click(priceTwentyToThirtyNine);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(6));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceTwentyToThirtyNine.value),
-        // });
-
-        // fireEvent.click(priceFortyToFiftyNine);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(7));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceFortyToFiftyNine.value),
-        // });
-
-        // fireEvent.click(priceSixtyToSeventyNine);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(8));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceSixtyToSeventyNine.value),
-        // });
-
-        // fireEvent.click(priceEightyToNintyNine);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(9));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceEightyToNintyNine.value),
-        // });
-
-        // fireEvent.click(priceHundredOrMore);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(10));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceHundredOrMore.value),
-        // });
-
-        // // Filter by category and price
-        // fireEvent.click(electronicsCategory);
-        // fireEvent.click(priceZeroToNinteen);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(12));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: ['electronics'],
-        //     radio: JSON.parse(priceZeroToNinteen.value),
-        // });
-
-        // fireEvent.click(eletronicsCategory);
-        // fireEvent.click(priceTwentyToThirtyNine);
-        // await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(14));
-        // expect(axios.post).toHaveBeenCalledWith('/api/v1/product/product-filters', {
-        //     checked: [],
-        //     radio: JSON.parse(priceTwentyToThirtyNine.value),
-        // });
-    });
+    });    
 
     it('should load more products when available', async () => {
         // Creating list of products for the price ranges (three each for min, max and some value in the middle)
@@ -600,5 +442,305 @@ describe('Home Page Component', () => {
         const bookCategory = await screen.findByText('Book');
         fireEvent.click(bookCategory);
         expect(screen.queryByText('Load More')).not.toBeInTheDocument();
+    });
+
+    it('should not show loading when there is an error', async () => {
+      const product_list = [LAPTOP, SMARTPHONE, NOVEL, NUS_TSHIRT, CONTRACT, TEXTBOOK];
+        const altered_products_list = product_list.flatMap(
+            (product) => [product, 
+                { ...product, _id: `${product._id}-middle`, price: product.price + 10 },
+                { ...product, _id: `${product._id}-high`, price: product.price + 19.99 },
+            ]);
+        axios.get.mockImplementation((url) => {
+            if (url === "/api/v1/category/get-category") {
+                return Promise.resolve({
+                data: {
+                    success: true,
+                    message: "All Category List",
+                    category: [LAPTOP.category, NOVEL.category, NUS_TSHIRT.category],
+                },
+                });
+            } else if (url === "/api/v1/product/product-count") {
+                return Promise.resolve({
+                data: {
+                    success: true,
+                    total: 18,
+                },
+                });
+            } else if (url === `/api/v1/product/product-list/1`) {
+                return Promise.resolve({
+                data: {
+                    success: true,
+                    products: altered_products_list.slice(0, 6),
+                },
+                });
+            } else if (url === `/api/v1/product/product-list/2`) {
+                return Promise.reject(new Error("Error getting products"));
+            };
+            return Promise.reject(new Error("not found"));
+        });
+    
+        const { getByText } = render(
+            <MemoryRouter initialEntries={['/']}>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        
+        await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(3));
+        expect(await screen.findByText('Load More')).toBeInTheDocument();
+
+        const loadMoreButton = await screen.findByText('Load More');
+        fireEvent.click(loadMoreButton);
+        await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(4));
+        expect(await screen.findByText('Loading ...')).toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText('Loading ...')).not.toBeInTheDocument());
+        expect(await screen.findByText('Load More')).toBeInTheDocument();
+      });
+});
+
+describe('Combination Filter test', () => {
+    function priceStringToArr(price) {
+      return price.split(',').map((p) => parseFloat(p));
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        axios.get.mockImplementation((url) => {
+          if (url === "/api/v1/category/get-category") {
+            return Promise.resolve({
+              data: {
+                success: true,
+                message: "All Category List",
+                category: [LAPTOP.category, NOVEL.category, NUS_TSHIRT.category],
+              },
+            });
+          } else if (url === "/api/v1/product/product-count") {
+            return Promise.resolve({
+              data: {
+                success: true,
+                total: 6,
+              },
+            });
+          } else if (url === `/api/v1/product/product-list/1`) {
+            return Promise.resolve({
+              data: {
+                success: true,
+                products: [LAPTOP, SMARTPHONE, NOVEL, NUS_TSHIRT, TEXTBOOK, CONTRACT],
+              },
+            });
+          }
+          return Promise.reject(new Error("not found"));
+        });
+
+        const { getByText } = render(
+            <MemoryRouter initialEntries={['/']}>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+    });
+
+    it('Should filter No categories + 0-19.99', async () => {
+        const priceZeroToNinteen = screen.getByLabelText('$0 to 19.99');
+        expect(priceZeroToNinteen).toBeInTheDocument();
+        fireEvent.click(priceZeroToNinteen);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining([]),
+            radio: priceStringToArr(priceZeroToNinteen.value),
+        });
+    });
+
+    it('Should filter Clothing + 20-39.99', async () => {
+        const clothingCategory = await screen.findByText('Clothing');
+        const priceTwentyToThirtyNine = screen.getByLabelText('$20 to 39.99');
+        expect(clothingCategory).toBeInTheDocument();
+        expect(priceTwentyToThirtyNine).toBeInTheDocument();
+        fireEvent.click(clothingCategory);
+        fireEvent.click(priceTwentyToThirtyNine);
+        await waitFor(() => expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['clothing']),
+            radio: priceStringToArr(priceTwentyToThirtyNine.value),
+        }));
+    });
+
+    it('Should filter Clothing, Book + 40-59.99', async () => {
+        const bookCategory = await screen.findByText('Book');
+        const clothingCategory = await screen.findByText('Clothing');
+        const priceFortyToFiftyNine = screen.getByLabelText('$40 to 59.99');
+        expect(bookCategory).toBeInTheDocument();
+        expect(clothingCategory).toBeInTheDocument();
+        expect(priceFortyToFiftyNine).toBeInTheDocument();
+        fireEvent.click(bookCategory);
+        fireEvent.click(clothingCategory);
+        fireEvent.click(priceFortyToFiftyNine);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['clothing', 'book']),
+            radio: priceStringToArr(priceFortyToFiftyNine.value),
+        });
+    });
+
+    it('Should filter Book, Electronics + 60-79.99', async () => {
+        const bookCategory = await screen.findByText('Book');
+        const electronicsCategory = await screen.findByText('Electronics');
+        const priceSixtyToSeventyNine = screen.getByLabelText('$60 to 79.99');
+        expect(bookCategory).toBeInTheDocument();
+        expect(electronicsCategory).toBeInTheDocument();
+        expect(priceSixtyToSeventyNine).toBeInTheDocument();
+        fireEvent.click(bookCategory);
+        fireEvent.click(electronicsCategory);
+        fireEvent.click(priceSixtyToSeventyNine);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['electronics', 'book']),
+            radio: priceStringToArr(priceSixtyToSeventyNine.value),
+        });
+    });
+
+    it('Should filter Clothing, Electronics + 80-99.99', async () => {
+        const clothingCategory = await screen.findByText('Clothing');
+        const electronicsCategory = await screen.findByText('Electronics');
+        const priceEightyToNintyNine = screen.getByLabelText('$80 to 99.99');
+        expect(clothingCategory).toBeInTheDocument();
+        expect(electronicsCategory).toBeInTheDocument();
+        expect(priceEightyToNintyNine).toBeInTheDocument();
+        fireEvent.click(clothingCategory);
+        fireEvent.click(electronicsCategory);
+        fireEvent.click(priceEightyToNintyNine);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['electronics', 'clothing']),
+            radio: priceStringToArr(priceEightyToNintyNine.value),
+        });
+    });
+
+    it('Should filter Clothing, Book + none', async () => {
+        const clothingCategory = await screen.findByText('Clothing');
+        const bookCategory = await screen.findByText('Book');
+        expect(clothingCategory).toBeInTheDocument();
+        expect(bookCategory).toBeInTheDocument();
+        fireEvent.click(clothingCategory);
+        fireEvent.click(bookCategory);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['clothing', 'book']),
+            radio: [],
+        });
+    });
+
+    it('Should filter Clothing, Book, Electronics + 100 or more', async () => {
+        const clothingCategory = await screen.findByText('Clothing');
+        const bookCategory = await screen.findByText('Book');
+        const electronicsCategory = await screen.findByText('Electronics');
+        const priceHundredOrMore = screen.getByLabelText('$100 or more');
+        expect(clothingCategory).toBeInTheDocument();
+        expect(bookCategory).toBeInTheDocument();
+        expect(electronicsCategory).toBeInTheDocument();
+        expect(priceHundredOrMore).toBeInTheDocument();
+        fireEvent.click(clothingCategory);
+        fireEvent.click(bookCategory);
+        fireEvent.click(electronicsCategory);
+        fireEvent.click(priceHundredOrMore);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: expect.arrayContaining(['electronics', 'clothing', 'book']),
+            radio: priceStringToArr(priceHundredOrMore.value),
+        });
+    });
+
+    it('Should filter check and uncheck', async () => {
+        const bookCategory = await screen.findByText('Book');
+        const electronicsCategory = await screen.findByText('Electronics');
+        expect(bookCategory).toBeInTheDocument();
+        expect(electronicsCategory).toBeInTheDocument();
+        fireEvent.click(bookCategory);
+        fireEvent.click(electronicsCategory);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+          checked: ['book', 'electronics'],
+          radio: [],
+        });
+        fireEvent.click(bookCategory);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+          checked: ['electronics'],
+          radio: [],
+        });
+    });
+
+    it('Should check and uncheck radio buttons', async () => {
+        const priceZeroToNinteen = screen.getByLabelText('$0 to 19.99');
+        const bookCategory = await screen.findByText('Book');
+        expect(priceZeroToNinteen).toBeInTheDocument();
+        expect(bookCategory).toBeInTheDocument();
+        fireEvent.click(priceZeroToNinteen);
+        fireEvent.click(bookCategory);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: ['book'],
+            radio: priceStringToArr(priceZeroToNinteen.value),
+        });
+        fireEvent.click(priceZeroToNinteen);
+        expect(axios.post).toHaveBeenLastCalledWith('/api/v1/product/product-filters', {
+            checked: ['book'],
+            radio: [],
+        });
+    });
+
+    it('Should refresh page when reset button is clicked', async () => {
+        const reloadSpy = jest.fn();
+        Object.defineProperty(window, 'location', {
+          configurable: true,
+          value: { reload: reloadSpy },
+        });
+        await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(3));
+        const resetButton = screen.getByText('RESET FILTERS');
+        expect(resetButton).toBeInTheDocument();
+        fireEvent.click(resetButton);
+        expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('should trigger getAllProducts when all filters are unchecked', async () => {
+        const initialProductListCalls = axios.get.mock.calls.filter(
+          (call) => call[0] === '/api/v1/product/product-list/1'
+        ).length;
+
+        const clothingCategory = await screen.findByText('Clothing');
+        fireEvent.click(clothingCategory);
+        fireEvent.click(clothingCategory);
+        
+        await waitFor(() => {
+          const newProductListCalls = axios.get.mock.calls.filter(
+            (call) => call[0] === '/api/v1/product/product-list/1'
+          ).length;
+          expect(newProductListCalls).toBe(initialProductListCalls + 1);
+        });
+
+        const priceZeroToNinteen = screen.getByLabelText('$0 to 19.99');
+        fireEvent.click(priceZeroToNinteen);
+        fireEvent.click(priceZeroToNinteen);
+
+        await waitFor(() => {
+          const newProductListCalls = axios.get.mock.calls.filter(
+            (call) => call[0] === '/api/v1/product/product-list/1'
+          ).length;
+          expect(newProductListCalls).toBe(initialProductListCalls + 2);
+        });
+
+    });
+
+    it('Should display filtered products and no have Load More', async () => {
+      axios.post.mockImplementation((url, data) => {
+        if (url === '/api/v1/product/product-filters') {
+          return Promise.resolve({
+            data: {
+              success: true,
+              products: [NUS_TSHIRT]
+            },
+          });
+        }
+        return Promise.reject(new Error('Unexpected axios.post call'));
+      });
+
+      const clothingCategory = await screen.findByText('Clothing');
+      fireEvent.click(clothingCategory);
+
+      expect(await screen.findByText('NUS T-shirt')).toBeInTheDocument();
+      expect(screen.queryByText('Load More')).not.toBeInTheDocument();
     });
 });

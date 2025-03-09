@@ -43,7 +43,6 @@ const HomePage = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-      console.log(data); // to be removed
       setLoading(false);
       setProducts(data.products);
       setFiltering(false);
@@ -57,7 +56,6 @@ const HomePage = () => {
   const getTotal = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
-      console.log(data); // to be removed
       setTotal(data?.total);
     } catch (error) {
       console.log(error);
@@ -73,7 +71,6 @@ const HomePage = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-      console.log(data); // to be removed
       setLoading(false);
       setProducts([...products, ...data?.products]);
     } catch (error) {
@@ -92,6 +89,7 @@ const HomePage = () => {
     }
     setChecked(all);
   };
+
   useEffect(() => {
     if (checked.length === 0 && radio.length === 0) getAllProducts();
   }, [checked.length, radio.length]);
@@ -107,7 +105,6 @@ const HomePage = () => {
         checked,
         radio,
       });
-      console.log(radio); // to be removed
       setProducts(data?.products);
       setFiltering(true);
     } catch (error) {
@@ -140,12 +137,27 @@ const HomePage = () => {
           {/* price filter */}
           <h4 className="text-center mt-4">Filter By Price</h4>
           <div className="d-flex flex-column">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
-              {Prices?.map((p) => (
+            <Radio.Group value={radio}>
+            {Prices?.map((p) => {
+              const isChecked = radio === p.array;
+              return (
                 <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
+                  <Radio
+                    value={p.array}
+                    checked={isChecked}
+                    onClick={() => {
+                      if (isChecked) {
+                        setRadio([]);
+                      } else {
+                        setRadio(p.array);
+                      }
+                    }}
+                  >
+                    {p.name}
+                  </Radio>
                 </div>
-              ))}
+              );
+            })}
             </Radio.Group>
           </div>
           <div className="d-flex flex-column">
