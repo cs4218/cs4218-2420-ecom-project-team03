@@ -105,4 +105,51 @@ describe("Category Product", () => {
         expect(screen.queryByText("Laptop")).not.toBeInTheDocument();
         expect(screen.queryByText("Phone")).not.toBeInTheDocument();
     });
+
+    it('fetches products only when params.slug is present', async () => {
+        axios.get.mockResolvedValue({ data: { products: [], category: {} } });
+    
+        const { rerender } = render(
+            <MemoryRouter initialEntries={["/category/electronics"]}>
+                <Routes>
+                    <Route path="/category/:slug" element={<CategoryProduct />} />
+                    <Route path="/" element={<CategoryProduct />} />
+                </Routes>
+            </MemoryRouter>
+        );
+    
+        await waitFor(() => {
+            expect(axios.get).toHaveBeenCalledWith("/api/v1/product/product-category/electronics");
+        });
+    
+        jest.clearAllMocks();
+    
+        rerender(
+            <MemoryRouter initialEntries={["/"]}>
+                <Routes>
+                    <Route path="/category/:slug" element={<CategoryProduct />} />
+                    <Route path="/" element={<CategoryProduct />} />
+                </Routes>
+            </MemoryRouter>
+        );
+    
+        await waitFor(() => {
+            expect(axios.get).not.toHaveBeenCalled();
+        });
+    });
+
+    it('does not fetch products when params.slug is not provided', async () => {
+        render(
+            <MemoryRouter initialEntries={["/category"]}>
+                <Routes>
+                    <Route path="/category/:slug" element={<CategoryProduct />} />
+                    <Route path="/category" element={<CategoryProduct />} />
+                </Routes>
+            </MemoryRouter>
+        );
+    
+        await waitFor(() => {
+            expect(axios.get).not.toHaveBeenCalled();
+        });
+    });
 });
