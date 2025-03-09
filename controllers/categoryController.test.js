@@ -74,10 +74,21 @@ describe("Category Controller", () => {
     });
 
     it("should return status 401 if name is empty", async () => {
+      req.body = { name: "" };
+
       await createCategoryController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.send).toHaveBeenCalledWith({ message: "Name is required" });
+      expect(res.send).toHaveBeenCalledWith({ message: "Category name cannot be empty or contain only whitespace" });
+    });
+
+    it("should return status 401 if name is only whitespace", async () => {
+      req.body = { name: "   " };
+
+      await createCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.send).toHaveBeenCalledWith({ message: "Category name cannot be empty or contain only whitespace" });
     });
 
     it("should handle any errors and return status 500", async () => {
@@ -144,7 +155,18 @@ describe("Category Controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith({
-        message: "Name is required",
+        message: "Category name cannot be empty or contain only whitespace",
+      });
+    });
+
+    it("should not update a category if new name is just whitespace", async () => {
+      req.body.name = "  ";
+
+      await updateCategoryController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.send).toHaveBeenCalledWith({
+        message: "Category name cannot be empty or contain only whitespace",
       });
     });
 
