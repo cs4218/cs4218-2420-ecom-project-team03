@@ -17,21 +17,26 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  //total price
+  // total price
   const totalPrice = () => {
     try {
       let total = 0;
-      cart?.map((item) => {
-        total = total + item.price;
+      cart?.forEach((item) => {
+        if (typeof item.price !== 'number') {
+          throw new Error(`Invalid price for item: ${item.name}`);
+        }
+        total += item.price;
       });
       return total.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      return 'Error calculating total price';
     }
   };
+
   //detele item
   const removeCartItem = (pid) => {
     try {
@@ -71,7 +76,7 @@ const CartPage = () => {
       localStorage.removeItem("cart");
       setCart([]);
       navigate("/dashboard/user/orders");
-      toast.success("Payment Completed Successfully ");
+      toast.success("Payment Completed Successfully");
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -91,7 +96,7 @@ const CartPage = () => {
                   ? `You Have ${cart.length} items in your cart ${
                       auth?.token ? "" : "please login to checkout !"
                     }`
-                  : " Your Cart Is Empty"}
+                  : "Your Cart Is Empty"}
               </p>
             </h1>
           </div>
@@ -162,7 +167,7 @@ const CartPage = () => {
                         })
                       }
                     >
-                      Plase Login to checkout
+                      Please Login to checkout
                     </button>
                   )}
                 </div>
