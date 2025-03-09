@@ -190,7 +190,7 @@ describe("Product Controller", () => {
       await createProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
     });
 
     it("should respond with a 400 when no description is given", async () => {
@@ -202,7 +202,7 @@ describe("Product Controller", () => {
       await createProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Description is required" });
     });
 
     it("should respond with a 400 when no price is given", async () => {
@@ -214,7 +214,18 @@ describe("Product Controller", () => {
       await createProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Price is required" });
+    });
+
+    it("should respond with a 400 when given price is negative", async () => {
+      req.fields = { ...LAPTOP_PRODUCT, price: -1 };
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await createProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({ error: "Price should not be negative" });
     });
 
     it("should respond with a 400 when no category is given", async () => {
@@ -226,7 +237,7 @@ describe("Product Controller", () => {
       await createProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Category is required" });
     });
 
     it("should respond with a 400 when no quantity is given", async () => {
@@ -238,7 +249,18 @@ describe("Product Controller", () => {
       await createProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Quantity is required" });
+    });
+
+    it("should respond with a 400 when given quantity is negative", async () => {
+      req.fields = { ...LAPTOP_PRODUCT, quantity: -1 };
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await createProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({ error: "Quantity should not be negative" });
     });
   });
 
@@ -584,7 +606,7 @@ describe("Product Controller", () => {
       await updateProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
     });
 
     it("should respond with a 400 when no description is given", async () => {
@@ -596,7 +618,7 @@ describe("Product Controller", () => {
       await updateProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Description is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Description is required" });
     });
 
     it("should respond with a 400 when no price is given", async () => {
@@ -608,7 +630,18 @@ describe("Product Controller", () => {
       await updateProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Price is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Price is required" });
+    });
+
+    it("should respond with a 400 when given price is negative", async () => {
+      req.fields = { ...LAPTOP_PRODUCT, price: -1 };
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({ error: "Price should not be negative" });
     });
 
     it("should respond with a 400 when no category is given", async () => {
@@ -620,7 +653,7 @@ describe("Product Controller", () => {
       await updateProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Category is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Category is required" });
     });
 
     it("should respond with a 400 when no quantity is given", async () => {
@@ -632,7 +665,18 @@ describe("Product Controller", () => {
       await updateProductController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith({ error: "Quantity is Required" });
+      expect(res.send).toHaveBeenCalledWith({ error: "Quantity is required" });
+    });
+
+    it("should respond with a 400 when given quantity is negative", async () => {
+      req.fields = { ...LAPTOP_PRODUCT, quantity: -1 };
+
+      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({ error: "Quantity should not be negative" });
     });
   });
 

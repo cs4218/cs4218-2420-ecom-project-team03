@@ -10,11 +10,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // payment gateway
+// values hardcoded for github actions
 export const gateway = new braintree.BraintreeGateway({
   environment: braintree.Environment.Sandbox,
-  merchantId: process.env.BRAINTREE_MERCHANT_ID ?? "hmrc3kfrt2xrvtvp",
-  publicKey: process.env.BRAINTREE_PUBLIC_KEY ?? "d3rnqcjwn7zk4fpt",
-  privateKey: process.env.BRAINTREE_PRIVATE_KEY ?? "767ed9ddd903781349d4c2af441f8eaa",
+  merchantId: "hmrc3kfrt2xrvtvp",
+  publicKey: "d3rnqcjwn7zk4fpt",
+  privateKey: "767ed9ddd903781349d4c2af441f8eaa",
 });
 
 export const createProductController = async (req, res) => {
