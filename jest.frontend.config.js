@@ -24,10 +24,12 @@ export default {
     "<rootDir>/client/src/pages/Auth/*.test.js",
     "<rootDir>/client/src/components/*.test.js",
     "<rootDir>/client/src/pages/admin/*.test.js",
+    "<rootDir>/client/src/pages/user/*.test.js",
   ],
   // jest code coverage
   collectCoverage: true,
-  collectCoverageFrom: ["client/src/pages/Auth/**", "client/src/components/**", "client/src/pages/admin/**"],
+  collectCoverageFrom: ["client/src/pages/Auth/**", "client/src/components/**", "client/src/pages/admin/**", "client/src/pages/user/**"],
+
   coverageThreshold: {
     global: {
       lines: 100,
