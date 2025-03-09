@@ -23,35 +23,43 @@ const UpdateProduct = () => {
   //get single product
   const getSingleProduct = async () => {
     try {
-      const { data } = await axios.get(
+      const { data, status } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
-      setName(data.product.name);
-      setId(data.product._id);
-      setDescription(data.product.description);
-      setPrice(data.product.price);
-      setPrice(data.product.price);
-      setQuantity(data.product.quantity);
-      setShipping(data.product.shipping);
-      setCategory(data.product.category._id);
+      if (data?.success && status == 200) {
+        setName(data.product.name);
+        setId(data.product._id);
+        setDescription(data.product.description);
+        setPrice(data.product.price);
+        setQuantity(data.product.quantity);
+        setShipping(data.product.shipping);
+        setCategory(data.product.category._id);
+      } else {
+        toast.error("Something went wrong when fetching product details");
+      }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong when fetching product details");
     }
   };
+
   useEffect(() => {
     getSingleProduct();
     //eslint-disable-next-line
   }, []);
+
   //get all category
   const getAllCategory = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
         setCategories(data?.category);
+      } else {
+        toast.error("Something went wrong in getting category");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error("Something went wrong in getting category");
     }
   };
 
@@ -59,7 +67,7 @@ const UpdateProduct = () => {
     getAllCategory();
   }, []);
 
-  //create product function
+  // create product function
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -70,35 +78,49 @@ const UpdateProduct = () => {
       productData.append("quantity", quantity);
       photo && productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.put(
+      productData.append("shipping", shipping);
+      const { data } = await axios.put(
         `/api/v1/product/update-product/${id}`,
         productData
       );
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Updated Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error("Something went wrong in updating product");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("something went wrong");
+      if (error.response?.status === 500) {
+        toast.error("Something went wrong in updating product");
+      } else if (error.response?.status === 400) {
+        toast.error("Invalid details provided");
+      } else {
+        toast.error("Something went wrong in updating product");
+      }
     }
   };
 
-  //delete a product
+  // delete a product
   const handleDelete = async () => {
     try {
-      let answer = window.prompt("Are You Sure want to delete this product ? ");
-      if (!answer) return;
+      let answer = window.prompt("Are you sure you want to delete this product?");
+      console.log(answer)
+      if (!answer) {
+        console.log("user rejected");
+        return;
+      }
       const { data } = await axios.delete(
         `/api/v1/product/delete-product/${id}`
       );
-      toast.success("Product DEleted Succfully");
-      navigate("/dashboard/admin/products");
+      if (data?.success) {
+        toast.success("Product Deleted Successfully");
+        navigate("/dashboard/admin/products");
+      } else {
+        toast.error("Something went wrong when deleting product");
+      }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error("Something went wrong when deleting product");
     }
   };
   return (
@@ -112,11 +134,12 @@ const UpdateProduct = () => {
             <h1>Update Product</h1>
             <div className="m-1 w-75">
               <Select
-                bordered={false}
+                variant="outlined"
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                className="form-select mb-3"
+                style={{ width: "100%" }}
+                className="mb-3"
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -132,6 +155,7 @@ const UpdateProduct = () => {
                 <label className="btn btn-outline-secondary col-md-12">
                   {photo ? photo.name : "Upload Photo"}
                   <input
+                    data-testid="file-upload"
                     type="file"
                     name="photo"
                     accept="image/*"
@@ -163,6 +187,7 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <input
+                  data-testid="name-input"
                   type="text"
                   value={name}
                   placeholder="write a name"
@@ -172,6 +197,7 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <textarea
+                  data-testid="desc-input"
                   type="text"
                   value={description}
                   placeholder="write a description"
@@ -182,6 +208,7 @@ const UpdateProduct = () => {
 
               <div className="mb-3">
                 <input
+                  data-testid="price-input"
                   type="number"
                   value={price}
                   placeholder="write a Price"
@@ -191,6 +218,7 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <input
+                  data-testid="quantity-input"
                   type="number"
                   value={quantity}
                   placeholder="write a quantity"
@@ -200,11 +228,12 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <Select
-                  bordered={false}
+                  variant="outlined"
                   placeholder="Select Shipping "
                   size="large"
                   showSearch
-                  className="form-select mb-3"
+                  style={{ width: "100%" }}
+                  className="mb-3"
                   onChange={(value) => {
                     setShipping(value);
                   }}
