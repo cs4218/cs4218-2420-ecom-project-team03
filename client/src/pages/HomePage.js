@@ -19,11 +19,13 @@ const HomePage = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [filtering, setFiltering] = useState(false);
 
   //get all cat
   const getAllCategory = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
+      console.log(data); // to be removed
       if (data?.success) {
         setCategories(data?.category);
       }
@@ -43,6 +45,7 @@ const HomePage = () => {
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setLoading(false);
       setProducts(data.products);
+      setFiltering(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -86,8 +89,9 @@ const HomePage = () => {
     }
     setChecked(all);
   };
+
   useEffect(() => {
-    if (!checked.length || !radio.length) getAllProducts();
+    if (checked.length === 0 && radio.length === 0) getAllProducts();
   }, [checked.length, radio.length]);
 
   useEffect(() => {
@@ -102,6 +106,7 @@ const HomePage = () => {
         radio,
       });
       setProducts(data?.products);
+      setFiltering(true);
     } catch (error) {
       console.log(error);
     }
@@ -132,12 +137,27 @@ const HomePage = () => {
           {/* price filter */}
           <h4 className="text-center mt-4">Filter By Price</h4>
           <div className="d-flex flex-column">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
-              {Prices?.map((p) => (
+            <Radio.Group value={radio}>
+            {Prices?.map((p) => {
+              const isChecked = radio === p.array;
+              return (
                 <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
+                  <Radio
+                    value={p.array}
+                    checked={isChecked}
+                    onClick={() => {
+                      if (isChecked) {
+                        setRadio([]);
+                      } else {
+                        setRadio(p.array);
+                      }
+                    }}
+                  >
+                    {p.name}
+                  </Radio>
                 </div>
-              ))}
+              );
+            })}
             </Radio.Group>
           </div>
           <div className="d-flex flex-column">
@@ -198,7 +218,7 @@ const HomePage = () => {
             ))}
           </div>
           <div className="m-2 p-3">
-            {products && products.length < total && (
+            {products && !filtering && products.length < total && (
               <button
                 className="btn loadmore"
                 onClick={(e) => {
@@ -210,8 +230,7 @@ const HomePage = () => {
                   "Loading ..."
                 ) : (
                   <>
-                    {" "}
-                    Loadmore <AiOutlineReload />
+                    Load More <AiOutlineReload/>
                   </>
                 )}
               </button>
