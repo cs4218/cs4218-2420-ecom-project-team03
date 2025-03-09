@@ -25,15 +25,19 @@ export const createProductController = async (req, res) => {
     // validation
     switch (true) {
       case !name:
-        return res.status(400).send({ error: "Name is Required" });
+        return res.status(400).send({ error: "Name is required" });
       case !description:
-        return res.status(400).send({ error: "Description is Required" });
+        return res.status(400).send({ error: "Description is required" });
       case !price:
-        return res.status(400).send({ error: "Price is Required" });
+        return res.status(400).send({ error: "Price is required" });
+      case price < 0:
+        return res.status(400).send({ error: "Price should not be negative" });
       case !category:
-        return res.status(400).send({ error: "Category is Required" });
+        return res.status(400).send({ error: "Category is required" });
       case !quantity:
-        return res.status(400).send({ error: "Quantity is Required" });
+        return res.status(400).send({ error: "Quantity is required" });
+      case quantity < 0:
+        return res.status(400).send({ error: "Quantity should not be negative" });
       case photo && photo.size > 1000000:
         return res
           .status(400)
@@ -171,15 +175,19 @@ export const updateProductController = async (req, res) => {
     // validation
     switch (true) {
       case !name:
-        return res.status(400).send({ error: "Name is Required" });
+        return res.status(400).send({ error: "Name is required" });
       case !description:
-        return res.status(400).send({ error: "Description is Required" });
+        return res.status(400).send({ error: "Description is required" });
       case !price:
-        return res.status(400).send({ error: "Price is Required" });
+        return res.status(400).send({ error: "Price is required" });
+      case price < 0:
+        return res.status(400).send({ error: "Price should not be negative" });
       case !category:
-        return res.status(400).send({ error: "Category is Required" });
+        return res.status(400).send({ error: "Category is required" });
       case !quantity:
-        return res.status(400).send({ error: "Quantity is Required" });
+        return res.status(400).send({ error: "Quantity is required" });
+      case quantity < 0:
+        return res.status(400).send({ error: "Quantity should not be negative" });
       case photo && photo.size > 1000000:
         return res
           .status(400)
