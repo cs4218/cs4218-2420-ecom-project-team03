@@ -14,4 +14,4 @@
 3. To run test files individually, run `npm run test -- xx.test.js`, where xx is the component's file name
 
 # Link for the CI
-https://github.com/cs4218/cs4218-2420-ecom-project-team03/actions/runs/13750509911/job/38450884220
+https://github.com/cs4218/cs4218-2420-ecom-project-team03/actions/runs/13751824260/job/38453721704
