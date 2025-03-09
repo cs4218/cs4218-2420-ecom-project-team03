@@ -21,22 +21,16 @@ export default {
 
   // only run these tests
   testMatch: [
-<<<<<<< HEAD
-=======
     "<rootDir>/client/src/pages/Auth/*.test.js",
     "<rootDir>/client/src/components/*.test.js",
     "<rootDir>/client/src/components/Form/*.test.js",
     "<rootDir>/client/src/pages/*.test.js",
     "<rootDir>/client/src/hooks/*.test.js",
     "<rootDir>/client/src/pages/admin/*.test.js",
->>>>>>> 3e9f2c7761ca6c68e6725f3048ed36b120a0bb4d
     "<rootDir>/client/src/pages/user/*.test.js",
   ],
   // jest code coverage
   collectCoverage: true,
-<<<<<<< HEAD
-  collectCoverageFrom: ["client/src/pages/user/**"],
-=======
   collectCoverageFrom: [
     "client/src/pages/Auth/**", 
     "client/src/components/**", 
@@ -46,8 +40,6 @@ export default {
     "client/src/pages/**",
     "client/src/components/Form/**"
   ],
-
->>>>>>> 3e9f2c7761ca6c68e6725f3048ed36b120a0bb4d
   coverageThreshold: {
     global: {
       lines: 100,
