@@ -42,7 +42,7 @@ describe('Search Integration', () => {
         jest.clearAllMocks();
       });
 
-  xit('should display search results after submitting a search query', async () => {
+  it('should display search results after submitting a search query', async () => {
     render(
         <MemoryRouter initialEntries={['/']}>
             <SearchProvider>
@@ -103,7 +103,7 @@ describe('Search Integration', () => {
     await waitFor(() => expect(screen.getByText("Product Details")).toBeInTheDocument());
   });
 
-  xit('should add product to cart when clicking "Add To Cart"', async () => {
+  it('should add product to cart when clicking "Add To Cart"', async () => {
     render(
         <MemoryRouter initialEntries={['/']}>
             <SearchProvider>
