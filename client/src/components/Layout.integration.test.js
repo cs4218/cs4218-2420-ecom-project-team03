@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { MemoryRouter } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -7,6 +7,7 @@ import { useAuth } from '../context/auth';
 import { useCart } from '../context/cart';
 import { useSearch } from '../context/search';
 import useCategory from "../hooks/useCategory";
+import toast from 'react-hot-toast';
 
 // Mock the hooks
 jest.mock('../context/auth', () => ({
@@ -23,6 +24,7 @@ jest.mock('../context/search', () => ({
 
 jest.mock('../hooks/useCategory', () => jest.fn(() => []));
 
+// Mock the toast function
 jest.mock('react-hot-toast');
 
 describe('Layout Integration', () => {
@@ -111,7 +113,7 @@ describe('Layout Integration', () => {
 
   it('renders Header with user logged in', () => {
     useAuth.mockReturnValue([{
-      user: { name: 'Test User', role: 1 },
+      user: { name: 'Test User', role: 0 },
       token: 'test-token',
     }, jest.fn()]);
   
@@ -163,5 +165,41 @@ describe('Layout Integration', () => {
     );
   
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+  });
+
+  it('logs out user correctly', () => {
+    const setAuthMock = jest.fn();
+    useAuth.mockReturnValue([{
+      user: { name: 'Test User', role: 1 },
+      token: 'test-token',
+    }, setAuthMock]);
+
+    useCart.mockReturnValue([[], jest.fn()]);
+
+    useCategory.mockReturnValue([
+      { _id: '1', name: 'Category 1', slug: 'category-1' },
+      { _id: '2', name: 'Category 2', slug: 'category-2' },
+    ]);
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <Layout>
+          <div>Test Content</div>
+        </Layout>
+      </MemoryRouter>
+    );
+
+    // Find the logout button and click it
+    const logoutButton = screen.getByRole('link', { name: 'Logout' });
+    fireEvent.click(logoutButton);
+
+    // Check if the user is logged out
+    expect(setAuthMock).toHaveBeenCalledWith({
+      user: null,
+      token: '',
+    });
+
+    // Check if the success message is displayed
+    expect(toast.success).toHaveBeenCalledWith('Logout Successfully');
   });
 });
