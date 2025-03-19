@@ -1,9 +1,19 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import AdminMenu from "../../components/AdminMenu";
 import Layout from "./../../components/Layout";
 import { useAuth } from "../../context/auth";
 const AdminDashboard = () => {
   const [auth] = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to login page if user is not authenticated or not an admin
+  React.useEffect(() => {
+    if (!auth?.user || auth?.user?.role !== 1) {
+      navigate("/login", { replace: true });
+    }
+  }, [auth, navigate]);
+
   return (
     <Layout>
       <div className="container-fluid m-3 p-3">
