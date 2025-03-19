@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/auth';
 import { useCart } from '../context/cart';
@@ -183,9 +183,10 @@ describe('Layout Integration', () => {
 
     render(
       <MemoryRouter initialEntries={['/']}>
-        <Layout>
-          <div>Test Content</div>
-        </Layout>
+        <Routes>
+          <Route path="/" element={<Layout />} />
+          <Route path="/login" element={<div>Login Page</div>} />
+        </Routes>
       </MemoryRouter>
     );
 
@@ -201,5 +202,8 @@ describe('Layout Integration', () => {
 
     // Check if the success message is displayed
     expect(toast.success).toHaveBeenCalledWith('Logout Successfully');
+
+    // Check if the user is redirected to the login page
+    expect(screen.getByText('Login Page')).toBeInTheDocument();
   });
 });
