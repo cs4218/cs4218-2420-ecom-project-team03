@@ -5,6 +5,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { useSearch, SearchProvider } from '../context/search';
 import SearchInput from '../components/Form/SearchInput';
 import ProductDetails from './ProductDetails';
+import CartPage from './CartPage';
 import Search from './Search';
 import axios from 'axios';
 
@@ -25,6 +26,13 @@ jest.mock('react-hot-toast');
 
 describe('Search Integration', () => {
     beforeEach(() => {
+        // Mock localStorage
+        window.localStorage = {
+            getItem: jest.fn(() => null),
+            setItem: jest.fn(),
+            removeItem: jest.fn(),
+        };
+
         // Mock the search API response
         axios.get.mockResolvedValue({
           data: [
@@ -132,5 +140,80 @@ describe('Search Integration', () => {
 
     // Check if the product is added to the cart
     expect(localStorage.getItem('cart')).toContain('Test Product');
+
+    // Dynamically render the CartPage component
+    render(
+        <MemoryRouter initialEntries={['/cart']}>
+            <SearchProvider>
+            <Routes>
+                <Route path="/cart" element={<CartPage />} />
+            </Routes>
+            </SearchProvider>
+        </MemoryRouter>
+    );
+
+    // Wait for the cart page to load and verify the cart contents
+    await waitFor(() => {
+      expect(screen.getByText('Test Product')).toBeInTheDocument();
+      expect(screen.getByText('$ 10.99')).toBeInTheDocument();
+    });
+  });
+
+  it('should display "No Products Found" when no products match the search query', async () => {
+    // Mock the search API response to return an empty array
+    axios.get.mockResolvedValue({ data: [] });
+
+    render(
+        <MemoryRouter initialEntries={['/']}>
+            <SearchProvider>
+            <Routes>
+                <Route path="/" element={<SearchInput />} />
+                <Route path="/search" element={<Search />} />
+            </Routes>
+            </SearchProvider>
+        </MemoryRouter>
+    );
+
+    // Find the search input and submit button
+    const searchInput = screen.getByPlaceholderText('Search');
+    const submitButton = screen.getByRole('button', { name: 'Search' });
+
+    // Enter a search query and submit the form
+    fireEvent.change(searchInput, { target: { value: 'noresults' } });
+    fireEvent.click(submitButton);
+
+    // Wait for the "No Products Found" message to be displayed
+    await waitFor(() => {
+      expect(screen.getByText('No Products Found')).toBeInTheDocument();
+    });
+  });
+
+  it('should display "No Products Found" when the search query is empty', async () => {
+    // Mock the search API response to return an empty array
+    axios.get.mockResolvedValue({ data: [] });
+  
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <SearchProvider>
+          <Routes>
+            <Route path="/" element={<SearchInput />} />
+            <Route path="/search" element={<Search />} />
+          </Routes>
+        </SearchProvider>
+      </MemoryRouter>
+    );
+  
+    // Find the search input and submit button
+    const searchInput = screen.getByPlaceholderText('Search');
+    const submitButton = screen.getByRole('button', { name: 'Search' });
+  
+    // Enter an empty search query and submit the form
+    fireEvent.change(searchInput, { target: { value: '' } });
+    fireEvent.click(submitButton);
+  
+    // Wait for the "No Products Found" message to be displayed
+    await waitFor(() => {
+      expect(screen.getByText('No Products Found')).toBeInTheDocument();
+    });
   });
 });

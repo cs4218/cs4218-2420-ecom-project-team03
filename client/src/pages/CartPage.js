@@ -17,6 +17,14 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    console.log('cart fetched form localStoage: ', localStorage.getItem('cart'))
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    console.log('storedCart: ', storedCart)
+    setCart(storedCart);
+  }, [cart]);
+
   // total price
   const totalPrice = () => {
     try {
