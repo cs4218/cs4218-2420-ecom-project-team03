@@ -78,7 +78,7 @@ export const getProductController = async (req, res) => {
     res.status(200).send({
       success: true,
       countTotal: products.length,
-      message: "AllProducts ",
+      message: "All Products Fetched",
       products,
     });
   } catch (error) {
@@ -98,11 +98,19 @@ export const getSingleProductController = async (req, res) => {
       .findOne({ slug: req.params.slug })
       .select("-photo")
       .populate("category");
-    res.status(200).send({
-      success: true,
-      message: "Single Product Fetched",
-      product,
-    });
+
+    if (!product) {
+      res.status(204).send({
+        success: true,
+        message: "No product with the slug found",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "Single Product Fetched",
+        product,
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -116,23 +124,18 @@ export const getSingleProductController = async (req, res) => {
 // get photo
 export const productPhotoController = async (req, res) => {
   try {
-    const product = await productModel.findById(req.params.pid)
-    if (!product) {
-      return res.status(400).send({
+    const productPhoto = await productModel.findById(req.params.pid).select("photo");
+    if (!productPhoto) {
+      return res.status(404).send({
         success: false,
         message: "No such product exists",
         error: "No such product exists"
       });
     }
     
-    const productPhoto = await product.select("photo");
-    if (productPhoto && productPhoto.data) {
-      res.set("Content-type", productPhoto.contentType);
-      return res.status(200).send({
-        success: true,
-        data: productPhoto.data,
-        message: "Photo Fetched Successfully"
-      });
+    if (productPhoto && productPhoto.photo.data) {
+      res.set("Content-type", productPhoto.photo.contentType);
+      return res.status(200).send(productPhoto.photo.data);
     } else {
       return res.status(204).send({
         success: true,
@@ -194,6 +197,8 @@ export const updateProductController = async (req, res) => {
           .status(400)
           .send({ error: "photo should be less then 1mb" });
     }
+
+    console.log(req.params.pid)
 
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
