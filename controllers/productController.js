@@ -1,6 +1,7 @@
 import productModel from "../models/productModel.js";
 import categoryModel from "../models/categoryModel.js";
 import orderModel from "../models/orderModel.js";
+import { ObjectId } from "mongodb";
 
 import fs from "fs";
 import slugify from "slugify";
@@ -78,7 +79,7 @@ export const getProductController = async (req, res) => {
     res.status(200).send({
       success: true,
       countTotal: products.length,
-      message: "AllProducts ",
+      message: "All Products Fetched",
       products,
     });
   } catch (error) {
@@ -86,7 +87,7 @@ export const getProductController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error in getting products",
-      error: error.message,
+      error,
     });
   }
 };
@@ -98,11 +99,19 @@ export const getSingleProductController = async (req, res) => {
       .findOne({ slug: req.params.slug })
       .select("-photo")
       .populate("category");
-    res.status(200).send({
-      success: true,
-      message: "Single Product Fetched",
-      product,
-    });
+
+    if (!product) {
+      res.status(404).send({
+        success: false,
+        message: "No such product exists",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "Single Product Fetched",
+        product,
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -116,28 +125,28 @@ export const getSingleProductController = async (req, res) => {
 // get photo
 export const productPhotoController = async (req, res) => {
   try {
-    const product = await productModel.findById(req.params.pid)
-    if (!product) {
-      return res.status(400).send({
+    if (!ObjectId.isValid(req.params.pid)) {
+      return res.status(404).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    }
+
+    const productPhoto = await productModel.findById(req.params.pid).select("photo");
+    if (!productPhoto) {
+      return res.status(404).send({
         success: false,
         message: "No such product exists",
         error: "No such product exists"
       });
     }
     
-    const productPhoto = await product.select("photo");
-    if (productPhoto && productPhoto.data) {
-      res.set("Content-type", productPhoto.contentType);
-      return res.status(200).send({
-        success: true,
-        data: productPhoto.data,
-        message: "Photo Fetched Successfully"
-      });
+    if (productPhoto && productPhoto.photo.data) {
+      res.set("Content-type", productPhoto.photo.contentType);
+      res.status(200).send(productPhoto.photo.data);
     } else {
-      return res.status(204).send({
-        success: true,
-        message: "No Photo Found"
-      });
+      res.status(200).send();
     }
   } catch (error) {
     console.log(error);
@@ -152,11 +161,26 @@ export const productPhotoController = async (req, res) => {
 // delete controller
 export const deleteProductController = async (req, res) => {
   try {
-    await productModel.findByIdAndDelete(req.params.pid).select("-photo");
-    res.status(200).send({
-      success: true,
-      message: "Product Deleted Successfully",
-    });
+    if (!ObjectId.isValid(req.params.pid)) {
+      return res.status(404).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    }
+    const product = await productModel.findByIdAndDelete(req.params.pid).select("-photo");
+    if (!product) {
+      res.status(404).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "Product Deleted Successfully",
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -195,11 +219,28 @@ export const updateProductController = async (req, res) => {
           .send({ error: "photo should be less then 1mb" });
     }
 
+    if (!ObjectId.isValid(req.params.pid)) {
+      return res.status(404).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    }
+
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
       { ...req.fields, slug: slugify(name) },
       { new: true }
     );
+
+    if (!products) {
+      return res.status(404).send({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    }
+
     if (photo) {
       products.photo.data = fs.readFileSync(photo.path);
       products.photo.contentType = photo.type;
@@ -227,7 +268,7 @@ export const productFiltersController = async (req, res) => {
     let args = {};
     if (checked && checked.length > 0) args.category = checked;
     if (radio && radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
-    const products = await productModel.find(args);
+    const products = await productModel.find(args).select("-photo");
     res.status(200).send({
       success: true,
       message: "Filtered Products Fetched",
@@ -300,11 +341,8 @@ export const searchProductController = async (req, res) => {
         ],
       })
       .select("-photo");
-    if (results.length > 0) {
-      res.status(200).json(results);
-    } else {
-      res.status(204).json(results);
-    }
+
+    res.status(200).json(results && results.length > 0 ? results : []);
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -319,6 +357,15 @@ export const searchProductController = async (req, res) => {
 export const relatedProductController = async (req, res) => {
   try {
     const { pid, cid } = req.params;
+
+    if (!ObjectId.isValid(pid) || !ObjectId.isValid(cid)) {
+      return res.status(404).send({
+        success: false,
+        message: "No such product or category exists",
+        error: "No such product or category exists"
+      });
+    }
+    
     const products = await productModel
       .find({
         category: cid,
@@ -328,19 +375,11 @@ export const relatedProductController = async (req, res) => {
       .limit(3)
       .populate("category");
     
-    if (products.length > 0) {
-      res.status(200).send({
-        success: true,
-        message: "Related Products Fetched",
-        products,
-      });
-    } else {
-      res.status(204).send({
-        success: true,
-        message: "No Related Products Found",
-        products,
-      });
-    }
+    res.status(200).send({
+      success: true,
+      message: "Related Products Fetched",
+      products: products && products.length > 0 ? products : [],
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -355,31 +394,21 @@ export const relatedProductController = async (req, res) => {
 export const productCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
-
     if (!category) {
-      res.status(400).send({
+      return res.status(404).send({
         success: false,
-        message: "Invalid category"
+        message: "No such category found",
+        error: "No such category found"
       });
-      return;
     }
 
     const products = await productModel.find({ category }).populate("category");
-    if (products.length > 0) {
-      res.status(200).send({
-        success: true,
-        message: "Products Fetched Successfully",
-        category,
-        products,
-      });
-    } else {
-      res.status(204).send({
-        success: true,
-        message: "No Products Found",
-        category,
-        products,
-      });
-    }
+    res.status(200).send({
+      success: true,
+      message: "Products Fetched Successfully",
+      category,
+      products: products.length > 0 ? products : [],
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({

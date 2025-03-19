@@ -45,7 +45,8 @@ export const loadDummyData = async (tblName, dummyData) => {
         await order.save();
         break;
       case "users":
-        // TODO: Implement for userController
+        const user = new userModel(data);
+        await user.save();
         break;
       default:
         console.error("invalid table name");

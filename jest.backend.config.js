@@ -13,6 +13,8 @@ export default {
     "<rootDir>/controllers/*.integration.test.js"
   ],
 
+  transform: {},
+
   // jest code coverage
   collectCoverage: true,
   collectCoverageFrom: ["controllers/**", "helpers/**",  "middlewares/**"],
