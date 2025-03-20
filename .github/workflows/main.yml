@@ -39,3 +39,6 @@ jobs:
       
       - name: Run Jest tests
         run: npm test
+      
+      - name: Run Jest frontend integration tests
+        run: npm run test:frontendIntegration
