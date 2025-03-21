@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./../components/Layout";
 import axios from "axios";
+import { useCart } from "../context/cart";
 import { useParams, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import "../styles/ProductDetailsStyles.css";
 
 const ProductDetails = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const [cart, setCart] = useCart();
   const [product, setProduct] = useState({});
   const [relatedProducts, setRelatedProducts] = useState([]);
 
@@ -20,6 +23,10 @@ const ProductDetails = () => {
       const { data } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
+      if (data?.product === null) {
+        navigate("/pagenotfound");
+        return;
+      }
       setProduct(data?.product);
       getSimilarProduct(data?.product._id, data?.product.category._id);
     } catch (error) {
@@ -42,7 +49,7 @@ const ProductDetails = () => {
       <div className="row container product-details">
         <div className="col-md-6">
           <img
-            src={`/api/v1/product/product-photo/${product._id}`}
+            src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${product._id}`}
             className="card-img-top"
             alt={product.name}
             height="300"
@@ -62,7 +69,24 @@ const ProductDetails = () => {
             })}
           </h6>
           <h6>Category : {product?.category?.name}</h6>
-          <button class="btn btn-secondary ms-1">ADD TO CART</button>
+          <button 
+            data-testid="primary-add-to-cart"
+            className="btn btn-secondary ms-1"
+            onClick={() => {
+              // let newCart = [];
+              // if (cart === null) {
+              //   newCart = [product];
+              // } else {
+              //   newCart = [...cart, product];
+              // }
+              setCart([...cart, product]);
+              localStorage.setItem(
+                "cart",
+                JSON.stringify([...cart, product])
+              );
+              toast.success("Item Added to cart");
+            }}
+          >ADD TO CART</button>
         </div>
       </div>
       <hr />
@@ -75,7 +99,7 @@ const ProductDetails = () => {
           {relatedProducts?.map((p) => (
             <div className="card m-2" key={p._id}>
               <img
-                src={`/api/v1/product/product-photo/${p._id}`}
+                src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`}
                 className="card-img-top"
                 alt={p.name}
               />
@@ -99,19 +123,19 @@ const ProductDetails = () => {
                   >
                     More Details
                   </button>
-                  {/* <button
-                  className="btn btn-dark ms-1"
-                  onClick={() => {
-                    setCart([...cart, p]);
-                    localStorage.setItem(
-                      "cart",
-                      JSON.stringify([...cart, p])
-                    );
-                    toast.success("Item Added to cart");
-                  }}
-                >
-                  ADD TO CART
-                </button> */}
+                  <button
+                    className="btn btn-dark ms-1"
+                    onClick={() => {
+                      setCart([...cart, p]);
+                      localStorage.setItem(
+                        "cart",
+                        JSON.stringify([...cart, p])
+                      );
+                      toast.success("Item Added to cart");
+                    }}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             </div>
