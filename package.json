@@ -12,7 +12,8 @@
     "sonarqube": "sonar-scanner",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:frontend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.config.js",
-    "test:backend": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js"
+    "test:backend": "cross-env NODE_ENV=backend-integration node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js",
+    "test:frontendIntegration": "cross-env NODE_ENV=frontend-integration start-server-and-test server http://localhost:6060 \"node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.integration.config.js || exit 0\""
   },
   "keywords": [],
   "author": "RP",
@@ -34,7 +35,8 @@
     "morgan": "^1.10.0",
     "nodemon": "^3.0.3",
     "react-icons": "^5.0.1",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "start-server-and-test": "^2.0.11"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",

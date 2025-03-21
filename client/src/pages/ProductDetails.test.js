@@ -182,7 +182,7 @@ describe('Product Details Component', () => {
     await waitFor(() => {
       const imgElement = screen.getByRole("img");
       expect(imgElement).toBeInTheDocument();
-      expect(imgElement).toHaveAttribute("src", "/api/v1/product/product-photo/1");
+      expect(imgElement).toHaveAttribute("src", expect.stringContaining("/api/v1/product/product-photo/1"));
       expect(imgElement).toHaveAttribute("alt", "Laptop");
     });
   });

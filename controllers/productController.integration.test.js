@@ -1,6 +1,6 @@
 import { expect, jest } from "@jest/globals";
 import request from "supertest";
-import { clearTestDB, closeTestDB, connectTestDB, loadDummyData } from "../config/test-db";
+import { clearTestDB, closeTestDB, connectTestDB, loadDummyData } from "../config/db";
 import app from "../server";
 import JWT from "jsonwebtoken";
 import slugify from "slugify";
@@ -10,6 +10,7 @@ import productModel from "../models/productModel";
 const LAPTOP_PRODUCT = {
   _id: "66db427fdb0119d9234b27f3",
   name: "Laptop",
+  slug: "Laptop",
   description: "A powerful laptop",
   price: 1499.99, 
   category: "66db427fdb0119d9234b27ed", 
@@ -20,6 +21,7 @@ const LAPTOP_PRODUCT = {
 const SMARTPHONE_PRODUCT = {
   _id: "66db427fdb0119d9234b27f5",
   name: "Smartphone",
+  slug: "Smartphone",
   description: "A high-end smartphone",
   price: 99.99, 
   category: "66db427fdb0119d9234b27ed", 
@@ -30,6 +32,7 @@ const SMARTPHONE_PRODUCT = {
 const BOOK_PRODUCT = {
   _id: "66db427fdb0119d9234b27f1",
   name: "Book",
+  slug: "Book",
   description: "A thick book",
   price: 10, 
   category: "66db427fdb0119d9234b27ef", 
@@ -50,12 +53,14 @@ const ADMIN_USER = {
 
 const ELECTRONIC_CATEGORY = {
   _id: LAPTOP_PRODUCT.category,
-  name: "Electronic"
+  name: "Electronic",
+  slug: "electronic"
 };
 
 const BOOK_CATEGORY = {
   _id: BOOK_PRODUCT.category,
-  name: "Book"
+  name: "Book",
+  slug: "book"
 };
 
 async function expectProductToExistAndMatch(id, expectedProduct) {
@@ -508,7 +513,11 @@ describe("Product Controller Integration", () => {
   describe("Retrieving Products by Category", () => {
     beforeEach(async () => {
       await loadDummyData("products", [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT]);
-      await loadDummyData("categories", [{ _id: (new mongoose.Types.ObjectId()).toString(), name: "dummy" }])
+      await loadDummyData("categories", [{ 
+        _id: (new mongoose.Types.ObjectId()).toString(), 
+        name: "dummy", 
+        slug: slugify("dummy") }]
+      );
     });
 
     it("should find products with the given category successfully", async () => {
