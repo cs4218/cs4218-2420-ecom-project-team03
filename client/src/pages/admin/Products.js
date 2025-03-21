@@ -7,18 +7,20 @@ import { Link } from "react-router-dom";
 const Products = () => {
   const [products, setProducts] = useState([]);
 
-  //getall products
+  // getall products
   const getAllProducts = async () => {
     try {
-      const { data } = await axios.get("/api/v1/product/get-product");
-      setProducts(data.products);
+      const response = await axios.get("/api/v1/product/get-product");
+      if (response.status === 200) {
+        setProducts(response.data.products);
+      }
     } catch (error) {
       console.log(error);
-      toast.error("Someething Went Wrong");
+      toast.error("Something went wrong in getting products");
     }
   };
 
-  //lifecycle method
+  // lifecycle method
   useEffect(() => {
     getAllProducts();
   }, []);
@@ -34,12 +36,13 @@ const Products = () => {
             {products?.map((p) => (
               <Link
                 key={p._id}
+                data-testid={p._id}
                 to={`/dashboard/admin/product/${p.slug}`}
                 className="product-link"
               >
                 <div className="card m-2" style={{ width: "18rem" }}>
                   <img
-                    src={`/api/v1/product/product-photo/${p._id}`}
+                    src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`}
                     className="card-img-top"
                     alt={p.name}
                   />
