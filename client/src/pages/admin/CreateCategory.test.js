@@ -57,9 +57,9 @@ describe("CreateCategory Component", () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      screen.findByText("Mocked Electronics");
-    });
+    const categoryTable = await screen.findByTestId("category-table");
+    const categoryElement = await within(categoryTable).findByText(mockCategories[0].name);
+    expect(categoryElement).toBeInTheDocument();
   });
 
   it("displays empty state when no categories are available", async () => {

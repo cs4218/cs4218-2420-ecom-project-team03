@@ -28,7 +28,13 @@ export default {
     "<rootDir>/client/src/hooks/*.test.js",
     "<rootDir>/client/src/pages/admin/*.test.js",
     "<rootDir>/client/src/pages/user/*.test.js",
+    "<rootDir>/client/src/context/*.test.js",
   ],
+
+  "testPathIgnorePatterns": [
+    "\\.integration\\.test\\.js$"
+  ],
+
   // jest code coverage
   collectCoverage: true,
   collectCoverageFrom: [
@@ -38,9 +44,9 @@ export default {
     "client/src/pages/user/**", 
     "client/src/hooks/**", 
     "client/src/pages/**",
-    "client/src/components/Form/**"
+    "client/src/components/Form/**",
+    "client/src/context/**"
   ],
-
   coverageThreshold: {
     global: {
       lines: 100,
