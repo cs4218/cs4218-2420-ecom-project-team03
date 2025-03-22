@@ -195,16 +195,16 @@ describe("CreateCategory Component", () => {
 
     const categoryTable = await screen.findByTestId("category-table");
     await waitFor(() => {
-      expect(within(categoryTable).getByText("Book")).toBeInTheDocument();
+      expect(within(categoryTable).getByText("New Category")).toBeInTheDocument();
     });
 
-    const bookRow = within(categoryTable).getByText("Book").closest("tr");
+    const targetRow = within(categoryTable).getByText("New Category").closest("tr");
 
-    const deleteButton = within(bookRow).getByText("Delete");
+    const deleteButton = within(targetRow).getByText("Delete");
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(within(categoryTable).queryByText("Book")).toBeNull();
+      expect(within(categoryTable).queryByText("New Category")).toBeNull();
     });
   });
 });
