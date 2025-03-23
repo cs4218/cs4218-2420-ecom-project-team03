@@ -46,7 +46,7 @@ const NORMAL_USER = {
   _id: "67136d5416c8949aec627dd3", 
   "name": "Test 3",
   "email": "hello@test.com",
-  "password": "$2b$10$asldvEFcFkNXlFpY.u8FZOq7gKegGCbVnCNACJr7ndC4bOjdImVWi",
+  "password": "$2b$10$OPgWg1s84vp1i4M1zlbEPubaKdil9YAqi1d9R.EsgaxybstWjmsMS",
   "phone": "123",
   "address": "hell3@test.com",
   "answer": "hello@test.com",
