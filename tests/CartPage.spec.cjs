@@ -1,9 +1,4 @@
 import { test, expect } from '@playwright/test';
-import axios from 'axios';
-
-const TEST_CARD_NUMBER = "4218123456781234";
-const TEST_CARD_EXPIRY_DATE = "08/2029";
-const TEST_CARD_CVV = "999";
 
 const userCredentials = {
   name: "Test User",
@@ -173,6 +168,53 @@ test('should calculate total price correctly', async ({ page }) => {
 
     await expect(page.getByText('Cart Summary')).toBeVisible();
     await expect(page.getByText('Total : $21.98')).toBeVisible();
+});
+
+test('should hanlde invalid prices', async ({ page }) => {
+  // Mock the search API response
+  await page.route('**/api/v1/product/search/*', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          _id: '1',
+          name: 'Test Product',
+          description: 'This is a test product',
+          price: 'invalid price',
+        },
+        {
+          _id: '2',
+          name: 'Another Product',
+          description: 'This is another test product',
+          price: 19.99,
+        },
+      ]),
+    });
+  });
+
+  await page.goto('localhost:3000');
+
+  // Fill the search input and submit the form
+  await page.fill('input[placeholder="Search"]', 'test');
+  await page.click('button[type="submit"]');
+
+  // Wait for the search results to be displayed
+  await expect(page.getByRole('heading', { name: 'Found 2' })).toBeVisible();
+
+  // Verify the search results
+  await expect(page.locator('h5:has-text("Test Product")')).toBeVisible();
+  await expect(page.locator('h5:has-text("Another Product")')).toBeVisible();
+  await expect(page.getByText('$ invalid price')).toBeVisible();
+  await expect(page.getByText('$ 19.99')).toBeVisible();
+
+  // Click Add to Cart button
+  await page.click('button:has-text("Add To Cart")');
+  await page.click('button:has-text("Add To Cart")');
+  await page.getByRole('link', { name: 'Cart' }).click();
+
+  await expect(page.getByText('Cart Summary')).toBeVisible();
+  await expect(page.getByText('Total : Error calculating total price')).toBeVisible();
 });
 
 test('should handle unauthenticated user', async ({ page }) => {
