@@ -18,3 +18,13 @@ export const UPDATED_DUMMY_PRODUCT = {
     quantity: "1",
     shipping: 'No'
 };
+
+export const DUMMY_CATEGORY = {
+    name: "new category"
+};
+export const DUPLICATE_DUMMY_CATEGORY = {
+    name: "duplicate"
+};
+export const UPDATED_DUMMY_CATEGORY = {
+    name: "new category1"
+};
