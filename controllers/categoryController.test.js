@@ -73,22 +73,28 @@ describe("Category Controller", () => {
       });
     });
 
-    it("should return status 401 if name is empty", async () => {
+    it("should return status 400 if name is empty", async () => {
       req.body = { name: "" };
 
       await createCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.send).toHaveBeenCalledWith({ message: "Category name cannot be empty or contain only whitespace" });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Category name cannot be empty or contain only whitespace",
+      });
     });
 
-    it("should return status 401 if name is only whitespace", async () => {
+    it("should return status 400 if name is only whitespace", async () => {
       req.body = { name: "   " };
 
       await createCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.send).toHaveBeenCalledWith({ message: "Category name cannot be empty or contain only whitespace" });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Category name cannot be empty or contain only whitespace",
+      });
     });
 
     it("should handle any errors and return status 500", async () => {
@@ -122,7 +128,7 @@ describe("Category Controller", () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        messsage: "Category Updated Successfully",
+        message: "Category Updated Successfully",
         category: { name: "updated", slug: slugify("updated") },
       });
     });
@@ -153,8 +159,9 @@ describe("Category Controller", () => {
 
       await updateCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
+        success: false,
         message: "Category name cannot be empty or contain only whitespace",
       });
     });
@@ -164,8 +171,9 @@ describe("Category Controller", () => {
 
       await updateCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
+        success: false,
         message: "Category name cannot be empty or contain only whitespace",
       });
     });
@@ -236,10 +244,12 @@ describe("Category Controller", () => {
     it("should return 404 if category is not found", async () => {
       req = { params: { slug: "nonexistent-slug" } };
       categoryModel.findOne = jest.fn().mockResolvedValue(null);
-    
+
       await singleCategoryController(req, res);
-    
-      expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "nonexistent-slug" });
+
+      expect(categoryModel.findOne).toHaveBeenCalledWith({
+        slug: "nonexistent-slug",
+      });
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
