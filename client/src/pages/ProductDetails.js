@@ -30,7 +30,12 @@ const ProductDetails = () => {
       setProduct(data?.product);
       getSimilarProduct(data?.product._id, data?.product.category._id);
     } catch (error) {
-      console.log(error);
+      if (error.response?.status == 404) {
+        navigate("/pagenotfound");
+        return;
+      } else {
+        console.log(error);
+      }
     }
   };
   //get similar product
@@ -49,7 +54,8 @@ const ProductDetails = () => {
       <div className="row container product-details">
         <div className="col-md-6">
           <img
-            src={`/api/v1/product/product-photo/${product._id}`}
+            data-testid="product-image"
+            src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${product._id}`}
             className="card-img-top"
             alt={product.name}
             height="300"
@@ -62,8 +68,7 @@ const ProductDetails = () => {
           <h6>Name : {product.name}</h6>
           <h6>Description : {product.description}</h6>
           <h6>
-            Price :
-            {product?.price?.toLocaleString("en-US", {
+            Price : {product?.price?.toLocaleString("en-US", {
               style: "currency",
               currency: "USD",
             })}
@@ -73,12 +78,6 @@ const ProductDetails = () => {
             data-testid="primary-add-to-cart"
             className="btn btn-secondary ms-1"
             onClick={() => {
-              // let newCart = [];
-              // if (cart === null) {
-              //   newCart = [product];
-              // } else {
-              //   newCart = [...cart, product];
-              // }
               setCart([...cart, product]);
               localStorage.setItem(
                 "cart",
@@ -99,7 +98,7 @@ const ProductDetails = () => {
           {relatedProducts?.map((p) => (
             <div className="card m-2" key={p._id}>
               <img
-                src={`/api/v1/product/product-photo/${p._id}`}
+                src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`}
                 className="card-img-top"
                 alt={p.name}
               />

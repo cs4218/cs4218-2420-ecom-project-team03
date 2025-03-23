@@ -114,7 +114,7 @@ describe('Product Details Component', () => {
     expect(getByText('Product Details')).toBeInTheDocument();
     expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
     expect(await screen.findByText('Description : A powerful laptop')).toBeInTheDocument();
-    expect(await screen.findByText('Price :$1,499.99')).toBeInTheDocument();
+    expect(await screen.findByText('Price : $1,499.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronics')).toBeInTheDocument();
     expect(getByText('ADD TO CART')).toBeInTheDocument();
   });
@@ -182,7 +182,7 @@ describe('Product Details Component', () => {
     await waitFor(() => {
       const imgElement = screen.getByRole("img");
       expect(imgElement).toBeInTheDocument();
-      expect(imgElement).toHaveAttribute("src", "/api/v1/product/product-photo/1");
+      expect(imgElement).toHaveAttribute("src", expect.stringContaining("/api/v1/product/product-photo/1"));
       expect(imgElement).toHaveAttribute("alt", "Laptop");
     });
   });
@@ -285,7 +285,7 @@ describe('Product Details Component', () => {
     expect(getByText('Product Details')).toBeInTheDocument();
     expect(await screen.findByText('Name : Smartphone')).toBeInTheDocument();
     expect(await screen.findByText('Description : A high-end smartphone')).toBeInTheDocument();
-    expect(await screen.findByText('Price :$999.99')).toBeInTheDocument();
+    expect(await screen.findByText('Price : $999.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronics')).toBeInTheDocument();
     expect(getByText('ADD TO CART')).toBeInTheDocument();
   });
@@ -368,7 +368,7 @@ describe('Product Details Component', () => {
     expect(getByText('Product Details')).toBeInTheDocument();
     expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
     expect(await screen.findByText('Description : A powerful laptop')).toBeInTheDocument();
-    expect(await screen.findByText('Price :$1,499.99')).toBeInTheDocument();
+    expect(await screen.findByText('Price : $1,499.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronics')).toBeInTheDocument();
     expect(getByText('ADD TO CART')).toBeInTheDocument();
     expect(getByText('Similar Products ➡️')).toBeInTheDocument();

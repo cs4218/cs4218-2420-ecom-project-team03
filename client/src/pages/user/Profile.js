@@ -16,12 +16,12 @@ const Profile = () => {
 
   //get user data
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
-    setName(name);
-    setPhone(phone);
-    setEmail(email);
-    setAddress(address);
-  }, [auth?.user]);
+    const { email, name, phone, address } = auth.user || {};
+    setName(name || "");
+    setPhone(phone || "");
+    setEmail(email || "");
+    setAddress(address || "");
+  }, [auth.user]);
 
   // form function
   const handleSubmit = async (e) => {
@@ -42,7 +42,7 @@ const Profile = () => {
         ls = JSON.parse(ls);
         ls.user = data.updatedUser;
         localStorage.setItem("auth", JSON.stringify(ls));
-        toast.success("Profile Updated Successfully");
+        toast.success(data.message);
       }
     } catch (error) {
       console.log(error);
