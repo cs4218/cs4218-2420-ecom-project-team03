@@ -1,17 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const ADMIN_USER = {
-    email: "cs4218@test.com",
-    password: "cs4218@test.com"
-};
-
-const DUMMY_PRODUCT = {
-    name: "test-product",
-    description: "this is a test product",
-    price: "20.4",
-    quantity: "40",
-    shipping: 'Yes'
-};
+import { ADMIN_USER, DUMMY_PRODUCT } from './dummyData';
 
 test('Creating a Product', async ({ page }) => {
     await page.goto('http://localhost:3000/');

@@ -1,17 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const ADMIN_USER = {
-    email: "cs4218@test.com",
-    password: "cs4218@test.com"
-};
-
-const UPDATED_DUMMY_PRODUCT = {
-    name: "test-product-2",
-    description: "this is not a test product",
-    price: "200",
-    quantity: "1",
-    shipping: 'No'
-};
+import { ADMIN_USER, UPDATED_DUMMY_PRODUCT } from './dummyData';
 
 test('Deleting a Product', async ({ page }) => {
     await page.goto('http://localhost:3000/');
@@ -28,11 +16,11 @@ test('Deleting a Product', async ({ page }) => {
     await page.getByRole('button', { name: 'CS 4218 Test Account' }).click();
     await page.getByRole('link', { name: 'Dashboard' }).click();
     await page.getByRole('link', { name: 'Products' }).click();
-    await page.click('a[href="/dashboard/admin/product/test-product-2"]');
+    await page.click(`a[href="/dashboard/admin/product/${UPDATED_DUMMY_PRODUCT.name}"]`);
 
     // Trigger delete
     const nameInput = page.getByTestId('name-input');
-    await expect(nameInput).toHaveValue('test-product-2');
+    await expect(nameInput).toHaveValue(UPDATED_DUMMY_PRODUCT.name);
 
     page.once('dialog', async dialog => {
         await dialog.accept('yes');
