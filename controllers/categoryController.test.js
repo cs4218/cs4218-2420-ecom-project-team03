@@ -122,7 +122,7 @@ describe("Category Controller", () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        messsage: "Category Updated Successfully",
+        message: "Category Updated Successfully",
         category: { name: "updated", slug: slugify("updated") },
       });
     });
@@ -155,6 +155,7 @@ describe("Category Controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
+        success: false,
         message: "Category name cannot be empty or contain only whitespace",
       });
     });
@@ -166,6 +167,7 @@ describe("Category Controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
+        success: false,
         message: "Category name cannot be empty or contain only whitespace",
       });
     });
