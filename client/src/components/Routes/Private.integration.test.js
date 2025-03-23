@@ -102,4 +102,32 @@ describe('PrivateRoute integration', () => {
 
     expect(screen.queryByText('Dashboard Page')).not.toBeInTheDocument();
   });
+
+  it('renders Spinner when api response { ok: false }', async () => {
+    await loginUser(normalCredentials);
+
+    // Mock the user-auth API to return ok: false
+    jest.spyOn(axios, 'get').mockResolvedValueOnce({
+      data: { ok: false },
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <Routes>
+            <Route path="/dashboard" element={<PrivateRoute />}>
+              <Route index element={<div>Dashboard Page</div>} />
+            </Route>
+            <Route path="/" element={<div>Public Page</div>} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/redirecting you in \d+ second\(s\)/i)).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Dashboard Page')).not.toBeInTheDocument();
+  });
 });
