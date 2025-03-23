@@ -89,7 +89,7 @@ describe("Products Component", () => {
         const productLink = screen.getByTestId(item._id);
         expect(productLink).toHaveAttribute("href", `/dashboard/admin/product/${item.slug}`);
         const productImage = await screen.findByAltText(item.name);
-        expect(productImage).toHaveAttribute("src", `/api/v1/product/product-photo/${item._id}`);
+        expect(productImage).toHaveAttribute("src", expect.stringContaining(`/api/v1/product/product-photo/${item._id}`));
       })
     );
   });

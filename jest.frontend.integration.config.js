@@ -21,20 +21,15 @@ export default {
 
   // only run these tests
   testMatch: [
-    "<rootDir>/client/src/pages/Auth/*.test.js",
-    "<rootDir>/client/src/components/*.test.js",
-    "<rootDir>/client/src/components/Form/*.test.js",
-    "<rootDir>/client/src/pages/*.test.js",
-    "<rootDir>/client/src/hooks/*.test.js",
-    "<rootDir>/client/src/pages/admin/*.test.js",
-    "<rootDir>/client/src/pages/user/*.test.js",
-    "<rootDir>/client/src/context/*.test.js",
+    "<rootDir>/client/src/pages/Auth/*.integration.test.js",
+    "<rootDir>/client/src/components/*.integration.test.js",
+    "<rootDir>/client/src/components/Form/*.integration.test.js",
+    "<rootDir>/client/src/pages/*.integration.test.js",
+    "<rootDir>/client/src/hooks/*.integration.test.js",
+    "<rootDir>/client/src/pages/admin/*.integration.test.js",
+    "<rootDir>/client/src/pages/user/*.integration.test.js",
+    "<rootDir>/client/src/context/*.integration.test.js",
   ],
-
-  "testPathIgnorePatterns": [
-    "\\.integration\\.test\\.js$"
-  ],
-
   // jest code coverage
   collectCoverage: true,
   collectCoverageFrom: [
