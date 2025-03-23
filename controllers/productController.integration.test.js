@@ -248,13 +248,21 @@ describe("Product Controller Integration", () => {
   });
 
   describe("Deleting a Product", () => {
+    let token;
+
+    beforeAll(async () => {
+      token = JWT.sign({ _id: ADMIN_USER._id }, process.env.JWT_SECRET, { expiresIn: "1m" });
+    });
+
     beforeEach(async () => {
+      await loadDummyData("users", [ADMIN_USER]);
       await loadDummyData("products", [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT]);
     });
 
     it("should delete product successfully", async () => {
       const res = await request(app)
-        .delete(`/api/v1/product/delete-product/${BOOK_PRODUCT._id}`);
+        .delete(`/api/v1/product/delete-product/${BOOK_PRODUCT._id}`)
+        .set("Authorization", token);
 
       expect(res.status).toBe(200);
       expect(await expectProductToNotExist(BOOK_PRODUCT._id)).toBeTruthy();  

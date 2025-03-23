@@ -47,6 +47,8 @@ export default {
     "client/src/components/Form/**",
     "client/src/context/**"
   ],
+
+
   coverageThreshold: {
     global: {
       lines: 100,
