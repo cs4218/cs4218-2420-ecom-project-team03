@@ -26,7 +26,7 @@ const UpdateProduct = () => {
       const { data, status } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
-      if (data?.success && status == 200) {
+      if (data?.success && status === 200) {
         setName(data.product.name);
         setId(data.product._id);
         setDescription(data.product.description);
@@ -84,6 +84,8 @@ const UpdateProduct = () => {
         productData
       );
       if (data?.success) {
+        // Refresh image cache
+        await axios.get(`/api/v1/product/product-photo/${id}`);
         toast.success("Product Updated Successfully");
         navigate("/dashboard/admin/products");
       } else {
@@ -104,7 +106,6 @@ const UpdateProduct = () => {
   const handleDelete = async () => {
     try {
       let answer = window.prompt("Are you sure you want to delete this product?");
-      console.log(answer)
       if (!answer) {
         console.log("user rejected");
         return;
