@@ -4,6 +4,7 @@ import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
 import SearchInput from "./Form/SearchInput";
 import useCategory from "../hooks/useCategory";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/cart";
 import { Badge } from "antd";
 import "../styles/Header.css";
@@ -11,6 +12,8 @@ const Header = () => {
   const [auth, setAuth] = useAuth();
   const [cart] = useCart();
   const categories = useCategory();
+  const navigate = useNavigate();
+  
   const handleLogout = () => {
     try {
       setAuth({
@@ -20,6 +23,7 @@ const Header = () => {
       });
       localStorage.removeItem("auth");
       toast.success("Logout Successfully");
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error(error);
       toast.error("Logout Failed");
@@ -129,8 +133,8 @@ const Header = () => {
                 </>
               )}
               <li className="nav-item">
-                <Badge count={cart?.length} showZero>
-                  <NavLink to="/cart" className="nav-link">
+                <Badge data-testid="cart-count" count={cart?.length} showZero>
+                  <NavLink data-testid="cart-header-button" to="/cart" className="nav-link">
                     Cart
                   </NavLink>
                 </Badge>
