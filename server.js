@@ -34,7 +34,7 @@ app.get('/', (req,res) => {
 
 const PORT = process.env.PORT || 6060;
 
-if (process.env.NODE_ENV != "test") {
+if (process.env.NODE_ENV != "backend-integration") {
     app.listen(PORT, () => {
         console.log(`Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
     });
