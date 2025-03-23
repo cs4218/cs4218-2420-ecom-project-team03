@@ -7,16 +7,10 @@ import ProductDetails from './ProductDetails';
 import { CartProvider } from '../context/cart';
 import Pagenotfound from './Pagenotfound';
 import CartPage from './CartPage';
+import { AuthProvider } from '../context/auth';
+import { SearchProvider } from '../context/search';
 
 axios.defaults.baseURL = "http://localhost:6060";
-
-jest.mock('../context/auth', () => ({
-  useAuth: jest.fn(() => [null, jest.fn()])
-}));
-  
-jest.mock('../context/search', () => ({
-  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()])
-})); 
 
 jest.mock("../hooks/useCategory", () => jest.fn(() => []));
 
@@ -37,33 +31,41 @@ describe('Product Details Component', () => {
 
   it('should render product details', async () => {
     const { getByText } = render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-            <Routes>
-                <Route path="/product/:slug" element={<ProductDetails />} />
-            </Routes>
-        </MemoryRouter>
-      </CartProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
-    expect(getByText('Product Details')).toBeInTheDocument();
+    expect(screen.getByText('Product Details')).toBeInTheDocument();
     expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
     expect(await screen.findByText('Description : A powerful laptop')).toBeInTheDocument();
     expect(await screen.findByText('Price : $1,499.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronic')).toBeInTheDocument();
-    expect(getByText('ADD TO CART')).toBeInTheDocument();
+    expect(screen.getByText('ADD TO CART')).toBeInTheDocument();
   });
 
   it('should add product to cart', async () => {
     render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-          <Routes>
-              <Route path="/product/:slug" element={<ProductDetails />} />
-              <Route path="/cart" element={<CartPage />} />
-          </Routes>
-        </MemoryRouter>
-      </CartProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+              <Routes>
+                  <Route path="/product/:slug" element={<ProductDetails />} />
+                  <Route path="/cart" element={<CartPage />} />
+              </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
     expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
@@ -81,13 +83,17 @@ describe('Product Details Component', () => {
 
   it('should generate product image with correct attributes', async () => {
     render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-            <Routes>
-                <Route path="/product/:slug" element={<ProductDetails />} />
-            </Routes>
-        </MemoryRouter>
-      </CartProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -99,69 +105,85 @@ describe('Product Details Component', () => {
   });
 
   it('should render no similar products', async () => {
-    const { getByText } = render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/book']}>
-            <Routes>
-                <Route path="/product/:slug" element={<ProductDetails />} />
-            </Routes>
-        </MemoryRouter>
-      </CartProvider>
+    render(
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/book']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
     expect(await screen.findByText('Name : Book')).toBeInTheDocument();
-    expect(getByText('Similar Products ➡️')).toBeInTheDocument();
+    expect(screen.getByText('Similar Products ➡️')).toBeInTheDocument();
     expect(await screen.findByText('No Similar Products found')).toBeInTheDocument();
   });
 
   it('should render similar product', async () => {
-    const { getByText } = render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-            <Routes>
-                <Route path="/product/:slug" element={<ProductDetails />} />
-            </Routes>
-        </MemoryRouter>
-      </CartProvider>
+    render(
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
-    expect(getByText('Similar Products ➡️')).toBeInTheDocument();
+    expect(screen.getByText('Similar Products ➡️')).toBeInTheDocument();
     expect(await screen.findByText('Smartphone')).toBeInTheDocument();
     expect(await screen.findByText('$99.99')).toBeInTheDocument();
     expect(await screen.findByText('A high-end smartphone...')).toBeInTheDocument();
   });
 
   it('should navigate to product details page of similar product', async () => {
-    const { getByText } = render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-            <Routes>
-                <Route path="/product/:slug" element={<ProductDetails />} />
-            </Routes>
-        </MemoryRouter>
-      </CartProvider>
+    render(
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
     
     expect(await screen.findByText('Smartphone')).toBeInTheDocument();
     fireEvent.click(await screen.findByText('More Details'));
 
-    expect(getByText('Product Details')).toBeInTheDocument();
+    expect(screen.getByText('Product Details')).toBeInTheDocument();
     expect(await screen.findByText('Name : Smartphone')).toBeInTheDocument();
     expect(await screen.findByText('Description : A high-end smartphone')).toBeInTheDocument();
     expect(await screen.findByText('Price : $99.99')).toBeInTheDocument();
     expect(await screen.findByText('Category : Electronic')).toBeInTheDocument();
-    expect(getByText('ADD TO CART')).toBeInTheDocument();
+    expect(screen.getByText('ADD TO CART')).toBeInTheDocument();
   });
 
   it('should add similar product to cart', async () => {
     render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/laptop']}>
-          <Routes>
-              <Route path="/product/:slug" element={<ProductDetails />} />
-          </Routes>
-        </MemoryRouter>
-      </CartProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/laptop']}>
+              <Routes>
+                  <Route path="/product/:slug" element={<ProductDetails />} />
+              </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
     expect(await screen.findByText('Name : Laptop')).toBeInTheDocument();
@@ -176,14 +198,18 @@ describe('Product Details Component', () => {
 
   it('should navigate to 404 is slug has no product associated with it', async () => {
     const { getByText } = render(
-      <CartProvider>
-        <MemoryRouter initialEntries={['/product/lamppost']}>
-          <Routes>
-            <Route path="/product/:slug" element={<ProductDetails />} />
-            <Route path="*" element={<Pagenotfound />} />
-          </Routes>
-        </MemoryRouter>
-      </CartProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <CartProvider>
+            <MemoryRouter initialEntries={['/product/lamppost']}>
+              <Routes>
+                <Route path="/product/:slug" element={<ProductDetails />} />
+                <Route path="*" element={<Pagenotfound />} />
+              </Routes>
+            </MemoryRouter>
+          </CartProvider>
+        </SearchProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => expect(getByText("404")).toBeInTheDocument());
