@@ -24,6 +24,7 @@ export default {
     "<rootDir>/client/src/pages/Auth/*.integration.test.js",
     "<rootDir>/client/src/components/*.integration.test.js",
     "<rootDir>/client/src/components/Form/*.integration.test.js",
+    "<rootDir>/client/src/components/Routes/*.integration.test.js",
     "<rootDir>/client/src/pages/*.integration.test.js",
     "<rootDir>/client/src/hooks/*.integration.test.js",
     "<rootDir>/client/src/pages/admin/*.integration.test.js",
