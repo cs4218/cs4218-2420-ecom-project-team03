@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import PrivateRoute from './Private';
 import axios from 'axios';
-import { DUMMY_USERS } from '../../misc/dummyData';
+import { DUMMY_USERS } from '../../misc/PrivateDummyData';
 import { AuthProvider } from '../../context/auth';
 
 axios.defaults.baseURL = 'http://localhost:6060';
