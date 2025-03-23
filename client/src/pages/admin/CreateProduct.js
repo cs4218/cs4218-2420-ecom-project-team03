@@ -63,7 +63,7 @@ const CreateProduct = () => {
       if (error.response?.status === 500) {
         toast.error("Something went wrong in creating product");
       } else if (error.response?.status === 400) {
-        toast.error("Invalid details provided");
+        toast.error(error.response.data.error);
       } else {
         toast.error("Something went wrong in creating product");
       }
@@ -86,7 +86,7 @@ const CreateProduct = () => {
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 className="mb-3"
                 onChange={(value) => {
                   setCategory(value);
@@ -167,7 +167,7 @@ const CreateProduct = () => {
                   placeholder="Select shipping"
                   size="large"
                   showSearch
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   className="mb-3"
                   onChange={(value) => {
                     setShipping(value);
