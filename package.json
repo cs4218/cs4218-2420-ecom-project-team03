@@ -12,7 +12,7 @@
     "sonarqube": "sonar-scanner",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:frontend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.config.js",
-    "test:backend": "cross-env NODE_ENV=backend-integration node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js",
+    "test:backend": "cross-env NODE_ENV=backend-integration node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js --detectOpenHandles --forceExit",
     "test:frontendIntegration": "cross-env NODE_ENV=frontend-integration start-server-and-test server http://localhost:6060 \"node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.integration.config.js || exit 0\""
   },
   "keywords": [],
