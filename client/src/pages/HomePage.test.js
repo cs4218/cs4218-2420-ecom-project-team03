@@ -7,7 +7,6 @@ import '@testing-library/jest-dom/extend-expect';
 import HomePage from './HomePage';
 import { Prices } from '../components/Prices';
 import ProductDetails from './ProductDetails';
-import { el } from 'date-fns/locale';
 
 const NUS_TSHIRT = {
     _id: 'nus t-shirt',
