@@ -112,32 +112,28 @@ describe("CreateCategory Component", () => {
 
     const categoryTable = await screen.findByTestId("category-table");
     await waitFor(() => {
-      expect(within(categoryTable).getByText("Electronic")).toBeInTheDocument();
+      expect(within(categoryTable).getByText("New Category")).toBeInTheDocument();
     });
 
     const electronicRow = within(categoryTable)
-      .getByText("Electronic")
+      .getByText("New Category")
       .closest("tr");
 
     const editButton = within(electronicRow).getByText("Edit");
     fireEvent.click(editButton);
 
     const updateForm = screen.getByTestId("update-category-form");
-    const updateInput = within(updateForm).getByDisplayValue("Electronic");
+    const updateInput = within(updateForm).getByDisplayValue("New Category");
     const updateSubmitButton = within(updateForm).getByText("Submit");
 
-    fireEvent.change(updateInput, { target: { value: "Updated Electronics" } });
+    fireEvent.change(updateInput, { target: { value: "Updated New Category" } });
     fireEvent.click(updateSubmitButton);
 
     await waitFor(() => {
       expect(
-        within(categoryTable).getByText("Updated Electronics")
+        within(categoryTable).getByText("Updated New Category")
       ).toBeInTheDocument();
     });
-
-    // Revert back the value
-    fireEvent.change(updateInput, { target: { value: "Electronic" } });
-    fireEvent.click(updateSubmitButton);
   });
 
   it("handles empty string successfully when updating a category", async () => {
@@ -195,16 +191,16 @@ describe("CreateCategory Component", () => {
 
     const categoryTable = await screen.findByTestId("category-table");
     await waitFor(() => {
-      expect(within(categoryTable).getByText("New Category")).toBeInTheDocument();
+      expect(within(categoryTable).getByText("Updated New Category")).toBeInTheDocument();
     });
 
-    const targetRow = within(categoryTable).getByText("New Category").closest("tr");
+    const targetRow = within(categoryTable).getByText("Updated New Category").closest("tr");
 
     const deleteButton = within(targetRow).getByText("Delete");
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(within(categoryTable).queryByText("New Category")).toBeNull();
+      expect(within(categoryTable).queryByText("Updated New Category")).toBeNull();
     });
   });
 });

@@ -3,27 +3,19 @@ import { renderHook, waitFor } from "@testing-library/react";
 import useCategory from "./useCategory";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DUMMY_CATEGORIES } from "../misc/dummyData";
 
 axios.defaults.baseURL = "http://localhost:6060";
 
 describe("useCategory hook", () => {
   it("handles API response with success:true", async () => {
-    const targetCategories = [
-      {
-        _id: "66db427fdb0119d9234b27ed",
-        name: "Electronic",
-        slug: "electronic",
-      },
-      { _id: "66db427fdb0119d9234b27ef", name: "Book", slug: "book" },
-    ];
-
     const { result } = renderHook(() => useCategory());
 
     await waitFor(() => {
       // filter out redundant field __v
       const categories = result.current.map(({ __v, ...rest }) => rest);
 
-      expect(categories).toEqual(targetCategories);
+      expect(categories).toEqual(DUMMY_CATEGORIES);
     });
   });
 

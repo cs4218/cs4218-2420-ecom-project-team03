@@ -23,6 +23,14 @@ jest.mock("../context/search", () => ({
 
 jest.mock("../hooks/useCategory", () => jest.fn(() => []));
 
+window.matchMedia = window.matchMedia || function () {
+    return {
+      matches: false,
+      addListener: () => {},
+      removeListener: () => {},
+    };
+  };
+
 describe("Category Product", () => {
     const mockProducts = [
         {

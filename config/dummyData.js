@@ -43,6 +43,17 @@ const ADMIN_USER = {
   role: 1
 };
 
+const NORMAL_USER = {
+  _id: "67136d5416c8949aec627dd3", 
+  "name": "Test 3",
+  "email": "hello@test.com",
+  "password": "$2b$10$OPgWg1s84vp1i4M1zlbEPubaKdil9YAqi1d9R.EsgaxybstWjmsMS",
+  "phone": "123",
+  "address": "hell3@test.com",
+  "answer": "hello@test.com",
+  "role": 0,
+}
+
 const ELECTRONIC_CATEGORY = {
   _id: LAPTOP_PRODUCT.category,
   name: "Electronic",
@@ -57,7 +68,7 @@ const BOOK_CATEGORY = {
 
 export const DUMMY_PRODUCTS = [LAPTOP_PRODUCT, SMARTPHONE_PRODUCT, BOOK_PRODUCT];
 export const DUMMY_CATEGORIES = [ELECTRONIC_CATEGORY, BOOK_CATEGORY];
-export const DUMMY_USERS = [ADMIN_USER];
+export const DUMMY_USERS = [ADMIN_USER, NORMAL_USER];
 export const DUMMY_ORDERS = [
   {
     _id: "65fdaae9b742d82e9e7a0001",
