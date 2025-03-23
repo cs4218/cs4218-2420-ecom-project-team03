@@ -226,7 +226,7 @@ describe("CreateCategory Component", () => {
   });
 
   it("handles empty string successfully when updating a category", async () => {
-    axios.put.mockRejectedValue();
+    axios.put.mockRejectedValue("Something went wrong");
 
     render(
       <MemoryRouter>
@@ -248,7 +248,7 @@ describe("CreateCategory Component", () => {
       expect(axios.put).toHaveBeenCalledWith("/api/v1/category/update-category/1", {
         name: "",
       });
-      expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+      expect(toast.error).toHaveBeenCalledWith("Something went wrong in input form");
     });
   });
 
