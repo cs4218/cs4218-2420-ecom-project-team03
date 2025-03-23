@@ -16,6 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          echo "PORT=6060" >> .env
+          echo "JWT_SECRET=HGFHGEAD12124322432" >> .env
+          echo "BRAINTREE_MERCHANT_ID=hmrc3kfrt2xrvtvp" >> .env
+          echo "BRAINTREE_PUBLIC_KEY=hmrc3kfrt2xrvtvp" >> .env
+          echo "BRAINTREE_PRIVATE_KEY=hmrc3kfrt2xrvtvp" >> .env
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -29,5 +37,11 @@ jobs:
           cd client
           npm install
       
-      - name: Run Jest tests
-        run: npm test
+      - name: Run Jest frontend unit tests
+        run: npm run test:frontend
+
+      - name: Run Jest backend tests
+        run: npm run test:backend
+      
+      - name: Run Jest frontend integration tests
+        run: npm run test:frontendIntegration

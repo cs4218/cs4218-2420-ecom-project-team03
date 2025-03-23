@@ -256,7 +256,7 @@ describe('Home Page Component', () => {
         const cardElement = novelCard.closest('.card');
         expect(cardElement).toBeInTheDocument();
         const cardWithin = within(cardElement);
-        expect(cardWithin.getByAltText('Novel')).toHaveAttribute('src', '/api/v1/product/product-photo/novel');
+        expect(cardWithin.getByAltText('Novel')).toHaveAttribute('src', expect.stringContaining('/api/v1/product/product-photo/novel'));
         expect(cardWithin.getByText('$40.00')).toBeInTheDocument();
         expect(cardWithin.getByText('A best-selling novel...')).toBeInTheDocument();
         expect(cardWithin.getByText('More Details')).toBeInTheDocument();

@@ -278,7 +278,7 @@ describe("Product Controller", () => {
       expect(res.send).toBeCalledWith({
         success: true,
         countTotal: 2,
-        message: "AllProducts ",
+        message: "All Products Fetched",
         products: [ LAPTOP_PRODUCT, SMARTPHONE_PRODUCT ],
       })
     });
@@ -296,7 +296,7 @@ describe("Product Controller", () => {
       expect(res.send).toBeCalledWith({
         success: true,
         countTotal: 0,
-        message: "AllProducts ",
+        message: "All Products Fetched",
         products: [],
       })
     });
@@ -306,7 +306,7 @@ describe("Product Controller", () => {
       productModel.populate = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockReturnThis();
       productModel.limit    = jest.fn().mockReturnThis();
-      productModel.sort     = jest.fn().mockRejectedValueOnce({ message: "Database Error" });
+      productModel.sort     = jest.fn().mockRejectedValueOnce("Database Error");
 
       await getProductController(req, res);
 
@@ -357,40 +357,35 @@ describe("Product Controller", () => {
 
   describe("productPhotoController", () => {
     it("should send a 200 when photo retrieval is successful", async () => {
-      req.params.pid = "mock-pid";
+      req.params.pid = LAPTOP_PRODUCT._id;
       res.set = jest.fn().mockImplementationOnce((key, value) => {
         res.contentType = value;
       });
 
       const mockImageData = Buffer.from("mock-image-data");
-      productModel.findById = jest.fn().mockResolvedValueOnce({
-        select: jest.fn().mockResolvedValueOnce({
+      productModel.findById = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce({
+        photo: {
           data: mockImageData,
           contentType: "image/jpeg"
-        })
+        }
       });
       
       await productPhotoController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.contentType).toBe("image/jpeg");
-      expect(res.send).toHaveBeenCalledWith({
-        success: true,
-        data: mockImageData,
-        message: "Photo Fetched Successfully"
-      });
+      expect(res.send).toHaveBeenCalledWith(mockImageData);
     });
 
-    it("should send a 400 when no product correlates to the pid given", async () => {
-      req.params.pid = "mock-pid";
-      res.set = jest.fn().mockImplementationOnce((key, value) => {
-        res.contentType = value;
-      });
-      productModel.findById  = jest.fn().mockResolvedValueOnce(null);
+    it("should send a 404 when no product correlates to the pid given", async () => {
+      req.params.pid = LAPTOP_PRODUCT._id;
+      productModel.findById  = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce(null);
       
       await productPhotoController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "No such product exists",
@@ -398,43 +393,38 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send a 204 when there is no photo for the pid given", async () => {
-      req.params.pid = "mock-pid";
-  
-      productModel.findById = jest.fn().mockResolvedValueOnce({
-        select: jest.fn().mockResolvedValueOnce(null)
-      });
+    it("should send a 404 when malformed pid is given", async () => {
+      req.params.pid = "invalid-pid";
       
       await productPhotoController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith({
-        success: true,
-        message: "No Photo Found"
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
       });
     });
 
-    it("should send a 204 when there is no photo data for the pid given", async () => {
-      req.params.pid = "mock-pid";
+    it("should send a 200 when there is no photo data for the pid given", async () => {
+      req.params.pid = LAPTOP_PRODUCT._id;
   
-      productModel.findById = jest.fn().mockResolvedValueOnce({
-        select: jest.fn().mockResolvedValueOnce({
-          contentType: VALID_LAPTOP_PHOTO.type,
-          data: null
-        })
+      productModel.findById = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce({
+        photo: {
+          data: null,
+          contentType: "image/jpeg"
+        }
       });
       
       await productPhotoController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(204);
-      expect(res.send).toHaveBeenCalledWith({
-        success: true,
-        message: "No Photo Found"
-      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith();
     });
 
     it("should send a 500 when photo retrieval is unsuccessful", async () => {
-      req.params.pid = "mock-pid";
+      req.params.pid = LAPTOP_PRODUCT._id;
       productModel.findById = jest.fn().mockReturnThis();
       productModel.select   = jest.fn().mockRejectedValueOnce("Database Error");
       
@@ -450,12 +440,12 @@ describe("Product Controller", () => {
   });
 
   describe("deleteProductController", () => {
-    it("should send a success when product deletion is successful", async () => {
+    it("should respond with a 200 when product deletion is successful", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
 
       productModel.findByIdAndDelete = jest.fn().mockReturnThis();
-      productModel.select = jest.fn().mockResolvedValueOnce(null);
+      productModel.select = jest.fn().mockResolvedValueOnce(LAPTOP_PRODUCT);
       
       await deleteProductController(req, res);
 
@@ -467,7 +457,38 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should send an error when product deletion is unsuccessful", async () => {
+    it("should respond with a 404 if pid given is malformed", async () => {
+      const mock_pid = "invalid-pid";
+      req.params.pid = mock_pid;
+      
+      await deleteProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    });
+
+    it("should respond with a 404 if no product with the given pid is found", async () => {
+      const mock_pid = LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
+
+      productModel.findByIdAndDelete = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce(null);
+      
+      await deleteProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    });
+
+    it("should respond with a 500 when product deletion is unsuccessful", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       req.params.pid = mock_pid;
       productModel.findByIdAndDelete = jest.fn().mockReturnThis();
@@ -562,12 +583,43 @@ describe("Product Controller", () => {
       expect(res.send).toHaveBeenCalledWith({ error: "photo should be less then 1mb" });
     });
 
+    it("should respond with a 404 if pid given is malformed", async () => {
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      const mock_pid = "invalid-pid";
+      req.params.pid = mock_pid;
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    });
+
+    it("should respond with a 404 if there is no product with the given pid to update", async () => {
+      req.fields = UPDATED_LAPTOP_PRODUCT;
+      const mock_pid = UPDATED_LAPTOP_PRODUCT._id;
+      req.params.pid = mock_pid;
+
+      productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(null);
+
+      await updateProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product exists",
+        error: "No such product exists"
+      });
+    });
+
     it("should respond with a 500 when there is a database error with the query", async () => {
       req.fields = LAPTOP_PRODUCT;
-      req.params.pid = "mock-pid";
+      req.params.pid = LAPTOP_PRODUCT._id;
 
-      productModel.findByIdAndUpdate = jest.fn().mockRejectedValue("Database Error");
-      productModel.prototype.save = jest.fn().mockResolvedValueOnce();
+      productModel.findByIdAndUpdate = jest.fn().mockRejectedValueOnce("Database Error");
 
       await updateProductController(req, res);
 
@@ -581,7 +633,7 @@ describe("Product Controller", () => {
 
     it("should respond with a 500 when there is a database error with updating", async () => {
       req.fields = UPDATED_LAPTOP_PRODUCT;
-      req.params.pid = "mock-pid";
+      req.params.pid = UPDATED_LAPTOP_PRODUCT._id;
 
       const laptopModel = new productModel(UPDATED_LAPTOP_PRODUCT);
       productModel.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(laptopModel);
@@ -687,7 +739,8 @@ describe("Product Controller", () => {
         radio: [100, 200]
       }
 
-      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
 
       await productFiltersController(req, res);
 
@@ -709,7 +762,8 @@ describe("Product Controller", () => {
         radio: []
       }
 
-      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
 
       await productFiltersController(req, res);
 
@@ -730,7 +784,8 @@ describe("Product Controller", () => {
         radio: [100, 200]
       }
 
-      productModel.find = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockResolvedValueOnce([ LAPTOP_PRODUCT, BOOK_PRODUCT ]);
 
       await productFiltersController(req, res);
 
@@ -750,8 +805,8 @@ describe("Product Controller", () => {
         checked: "66db427fdb0119d9234b27ed",
         radio: [100, 200]
       }
-
-      productModel.find = jest.fn().mockRejectedValueOnce("Database Error");
+      productModel.find   = jest.fn().mockReturnThis();
+      productModel.select = jest.fn().mockRejectedValueOnce("Database Error");
 
       await productFiltersController(req, res);
 
@@ -898,7 +953,7 @@ describe("Product Controller", () => {
       expect(res.json).toHaveBeenCalledWith(matching_products);
     });
 
-    it("should respond with a 204 when no products match keyword", async () => {
+    it("should respond with a 200 when no products match keyword", async () => {
       const mock_keyword = "mock";
       req.params.keyword = mock_keyword;
 
@@ -909,7 +964,7 @@ describe("Product Controller", () => {
 
       await searchProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(empty_products);
     });
 
@@ -959,7 +1014,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 204 when there are no related products", async () => {
+    it("should respond with a 200 when there are no related products", async () => {
       const mock_pid = LAPTOP_PRODUCT._id;
       const mock_cid = LAPTOP_PRODUCT.category;
       req.params.pid = mock_pid;
@@ -974,11 +1029,43 @@ describe("Product Controller", () => {
 
       await relatedProductController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        message: "No Related Products Found",
+        message: "Related Products Fetched",
         products: empty_products
+      });
+    });
+
+    it("should respond with a 404 if pid given is malformed", async () => {
+      const mock_pid = "invalid-pid";
+      const mock_cid = LAPTOP_PRODUCT.category;
+      req.params.pid = mock_pid;
+      req.params.cid = mock_cid;
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product or category exists",
+        error: "No such product or category exists"
+      });
+    });
+
+    it("should respond with a 404 if cid given is malformed", async () => {
+      const mock_pid = LAPTOP_PRODUCT._id;
+      const mock_cid = "invalid-cid";
+      req.params.pid = mock_pid;
+      req.params.cid = mock_cid;
+
+      await relatedProductController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "No such product or category exists",
+        error: "No such product or category exists"
       });
     });
 
@@ -1032,7 +1119,7 @@ describe("Product Controller", () => {
       });
     });
 
-    it("should respond with a 204 when there are no products for the category", async () => {
+    it("should respond with a 200 when there are no products for the category", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -1048,16 +1135,16 @@ describe("Product Controller", () => {
 
       await productCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.send).toHaveBeenCalledWith({
         success: true,
-        message: "No Products Found",
+        message: "Products Fetched Successfully",
         category: category,
         products: mock_products,
       });
     });
 
-    it("should respond with a 400 when no category is found", async () => {
+    it("should respond with a 404 when no category is found", async () => {
       const mock_slug = "electronics";
       req.params.slug = mock_slug;
 
@@ -1065,10 +1152,11 @@ describe("Product Controller", () => {
 
       await productCategoryController(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: "Invalid category",
+        message: "No such category found",
+        error: "No such category found"
       });
     });
 
