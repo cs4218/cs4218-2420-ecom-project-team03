@@ -212,6 +212,8 @@ describe("Update Product Component", () => {
   it("should successfully update product details", async () => {
     axios.get.mockResolvedValueOnce(successfulProductResponse);
     axios.get.mockResolvedValueOnce(successfulCategoryResponse);
+    axios.put.mockResolvedValueOnce({ data: { success: true }});
+    axios.get.mockResolvedValueOnce("");
 
     const { getByText, getByPlaceholderText } = render(
       <MemoryRouter initialEntries={["/admin/product/laptop"]}>
@@ -248,7 +250,6 @@ describe("Update Product Component", () => {
     expect(await screen.getByText(updatedMockProduct.photo.name)).toBeInTheDocument();
     expect(await screen.getByRole("img")).toHaveAttribute("src", updatedMockProduct.photo.name);    
 
-    axios.put.mockResolvedValueOnce({ data: { success: true }});
     // Trigger form submission
     fireEvent.click(getByText("UPDATE PRODUCT"));
     await waitFor(() => expect(axios.put).toHaveBeenCalled());
@@ -260,6 +261,8 @@ describe("Update Product Component", () => {
       }
       expect(Object.hasOwn(updatedMockProduct, pair[0]) && updatedMockProduct[pair[0]] === pair[1]).toBeTruthy();
     }
+
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
     expect(toast.success).toHaveBeenCalledWith("Product Updated Successfully");
   });
 
