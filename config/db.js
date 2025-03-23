@@ -6,7 +6,7 @@ import categoryModel from "../models/categoryModel.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import slugify from "slugify";
-import { DUMMY_CATEGORIES, DUMMY_PRODUCTS, DUMMY_USERS } from "./dummyData.js";
+import { DUMMY_CATEGORIES, DUMMY_PRODUCTS, DUMMY_USERS, DUMMY_ORDERS } from "./dummyData.js";
 
 let mongoServer = null;
 
@@ -17,6 +17,7 @@ const connectDB = async () => {
         await loadDummyData("products", DUMMY_PRODUCTS);
         await loadDummyData("categories", DUMMY_CATEGORIES);
         await loadDummyData("users", DUMMY_USERS);
+        await loadDummyData("orders", DUMMY_ORDERS);
         return;
     } else if (process.env.NODE_ENV == "backend-integration") {
         console.log("Test environment detected. Connection to actual database denied.");
