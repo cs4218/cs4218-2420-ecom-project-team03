@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
         {
           _id: '2',
           name: 'Another Product',
-          description: 'This is another test product',
+          description: 'This is another test product, with a very long description that is longer than 30 characters, expect to see ... on the page',
           price: 19.99,
         },
       ]),
@@ -49,6 +49,7 @@ test('should display search results correctly', async ({ page }) => {
   await expect(page.locator('h5:has-text("Another Product")')).toBeVisible();
   await expect(page.getByText('$ 10.99')).toBeVisible();
   await expect(page.getByText('$ 19.99')).toBeVisible();
+  await expect(page.getByText('This is another test product, ...')).toBeVisible();
 });
 
 test('should display "No Products Found" when no products match the search query', async ({ page }) => {
