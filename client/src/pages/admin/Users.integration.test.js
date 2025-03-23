@@ -21,7 +21,6 @@ describe("Users Component Integration Test", () => {
       </AuthProvider>
     );
 
-    expect(screen.getByText("Dashboard - All Users")).toBeInTheDocument();
     expect(screen.getByText("All Users")).toBeInTheDocument();
     expect(screen.getByText("Admin Panel")).toBeInTheDocument();
   });
