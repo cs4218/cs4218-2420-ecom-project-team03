@@ -30,7 +30,12 @@ const ProductDetails = () => {
       setProduct(data?.product);
       getSimilarProduct(data?.product._id, data?.product.category._id);
     } catch (error) {
-      console.log(error);
+      if (error.response?.status == 404) {
+        navigate("/pagenotfound");
+        return;
+      } else {
+        console.log(error);
+      }
     }
   };
   //get similar product
@@ -49,6 +54,7 @@ const ProductDetails = () => {
       <div className="row container product-details">
         <div className="col-md-6">
           <img
+            data-testid="product-image"
             src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${product._id}`}
             className="card-img-top"
             alt={product.name}
@@ -72,12 +78,6 @@ const ProductDetails = () => {
             data-testid="primary-add-to-cart"
             className="btn btn-secondary ms-1"
             onClick={() => {
-              // let newCart = [];
-              // if (cart === null) {
-              //   newCart = [product];
-              // } else {
-              //   newCart = [...cart, product];
-              // }
               setCart([...cart, product]);
               localStorage.setItem(
                 "cart",
