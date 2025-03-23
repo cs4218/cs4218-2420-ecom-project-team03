@@ -1,3 +1,5 @@
+// A copy of dummyData.js in config folder to allow jest tests to reference
+
 const LAPTOP_PRODUCT = {
   _id: "66db427fdb0119d9234b27f3",
   name: "Laptop",
@@ -37,7 +39,7 @@ const ADMIN_USER = {
   answer: "password123",
   email: "test@example.com",
   name: "John Doe",
-  password: "$2b$10$Gm/jh/WplbLtkzJoYKAwHegUJU3N2WEUv9cc5qVHoT4SPyp9VSGvi",
+  password: "$2b$10$Gm/jh/WplbLtkzJoYKAwHegUJU3N2WEUv9cc5qVHoT4SPyp9VSGvi", // password123
   phone: "1234567890",
   role: 1
 };
