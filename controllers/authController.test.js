@@ -430,7 +430,7 @@ describe("Update Profile Controller", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
             success: true,
-            message: "Profile Updated SUccessfully",
+            message: "Profile Updated Successfully",
             updatedUser: expect.objectContaining({
                 _id: "user123",
                 name: "John Doe",
@@ -475,7 +475,7 @@ describe("Update Profile Controller", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
             success: true,
-            message: "Profile Updated SUccessfully",
+            message: "Profile Updated Successfully",
             updatedUser: expect.objectContaining({
                 _id: "user123",
                 name: "John Doe",
@@ -523,7 +523,7 @@ describe("Update Profile Controller", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
             success: true,
-            message: "Profile Updated SUccessfully",
+            message: "Profile Updated Successfully",
             updatedUser: expect.objectContaining({
                 _id: "user123",
                 name: "Old Name",
@@ -571,7 +571,7 @@ describe("Update Profile Controller", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.send).toHaveBeenCalledWith({
             success: true,
-            message: "Profile Updated SUccessfully",
+            message: "Profile Updated Successfully",
             updatedUser: expect.objectContaining({
                 _id: "user123",
                 name: "John Doe",
@@ -589,7 +589,7 @@ describe("Update Profile Controller", () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
             success: false,
-            message: "Error WHile Update profile",
+            message: "Error While Update profile",
             error: expect.any(Error),
         });
     });

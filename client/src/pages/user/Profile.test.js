@@ -103,6 +103,7 @@ describe("Profile Component", () => {
   it("updates profile successfully", async () => {
     axios.put.mockResolvedValue({
       data: {
+        message: "Profile Updated Successfully",
         updatedUser: {
           name: "new",
           email: "Tester@test.com", // same email
