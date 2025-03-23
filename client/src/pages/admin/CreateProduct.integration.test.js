@@ -75,7 +75,7 @@ const DUMMY_PRODUCT = {
   slug: slugify("Dummy"),
   description: "A dummy product",
   price: 1234.56,
-  category: "66db427fdb0119d9234b27ed",
+  category: "66db427fdb0119d9234b27ef",
   quantity: 1234,
   shipping: 0,
   photo: {
