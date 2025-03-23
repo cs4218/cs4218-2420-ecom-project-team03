@@ -5,7 +5,7 @@ import {
   closeTestDB,
   connectTestDB,
   loadDummyData,
-} from "../config/test-db";
+} from "../config/db";
 import app from "../server";
 import JWT from "jsonwebtoken";
 import slugify from "slugify";
