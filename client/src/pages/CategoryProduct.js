@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/CategoryProductStyles.css";
+import toast from "react-hot-toast";
 import axios from "axios";
 const CategoryProduct = () => {
   const params = useParams();
@@ -21,6 +22,7 @@ const CategoryProduct = () => {
       setCategory(data?.category);
     } catch (error) {
       console.log(error);
+      toast.error(error);
     }
   };
 
